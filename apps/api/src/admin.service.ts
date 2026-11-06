@@ -6,7 +6,8 @@ import {
 import argon2 from 'argon2';
 import { PrismaService } from './prisma.service';
 import { AuthUser } from './auth';
-import { Prisma } from './generated/prisma/client';
+import type { Prisma } from './generated/prisma/client';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/client';
 import {
   CategoryDto,
   CreateReservationDto,
@@ -19,6 +20,7 @@ import {
   OpeningHourDto,
   PageDto,
   ReservationUpdateDto,
+  ReservationSlotsQueryDto,
   SocialLinkDto,
   UserDto,
   UserProfileDto,
@@ -582,7 +584,7 @@ export class AdminService {
   }
 
   async reservations(q: ListQueryDto) {
-    const where = q.search
+    const where: Prisma.ReservationWhereInput = q.search
       ? {
           OR: [
             { name: { contains: q.search, mode: 'insensitive' as const } },
@@ -599,15 +601,23 @@ export class AdminService {
           ],
         }
       : {};
+    if (q.from || q.to) {
+      if (q.from && q.to && q.from >= q.to) throw new BadRequestException('Période invalide');
+      where.date = { ...(q.from ? { gte: new Date(q.from) } : {}), ...(q.to ? { lt: new Date(q.to) } : {}) };
+    }
     const [data, total] = await Promise.all([
       this.prisma.reservation.findMany({
         where,
         ...this.paging(q),
-        orderBy: { date: 'desc' },
+        orderBy: [{ date: 'asc' }, { time: 'asc' }, { id: 'asc' }],
       }),
       this.prisma.reservation.count({ where }),
     ]);
     return this.result(data, total, q);
+  }
+  async reservationSlots(id: string, query: ReservationSlotsQueryDto) {
+    await this.prisma.reservation.findUniqueOrThrow({ where: { id }, select: { id: true } });
+    return this.availability.slots(query.date, query.guests, id);
   }
   async createReservation(dto: CreateReservationDto, user: AuthUser) {
     await this.availability.assertReservable(dto.date, dto.time, dto.guests);
@@ -625,17 +635,30 @@ export class AdminService {
     const current = await this.prisma.reservation.findUniqueOrThrow({
       where: { id },
     });
-    await this.availability.assertReservable(
-      dto.date ?? current.date,
-      dto.time ?? current.time,
-      dto.guests ?? current.guests,
-      id,
-    );
-    const item = await this.prisma.reservation.update({
-      where: { id },
-      data: { ...dto, date: dto.date ? new Date(dto.date) : undefined },
-    });
-    if (dto.status && dto.status !== current.status && ['CONFIRMED', 'CANCELLED'].includes(dto.status)) {
+    const { expectedStatus, ...changes } = dto;
+    if (expectedStatus && current.status !== expectedStatus)
+      throw new ConflictException('Cette réservation a été modifiée par un autre membre de l’équipe. Actualisez la vue.');
+    const undoAttendance = !!expectedStatus && ['COMPLETED', 'NO_SHOW'].includes(expectedStatus)
+      && !!dto.status && ['PENDING', 'CONFIRMED'].includes(dto.status)
+      && Object.keys(changes).every(key => key === 'status');
+    if (dto.date !== undefined || dto.time !== undefined || dto.guests !== undefined ||
+        (dto.status === 'CONFIRMED' && current.status !== 'CONFIRMED') || undoAttendance) {
+      const args = [dto.date ?? current.date, dto.time ?? current.time, dto.guests ?? current.guests, id] as const;
+      if (undoAttendance) await this.availability.assertReservable(...args, true);
+      else await this.availability.assertReservable(...args);
+    }
+    let item;
+    try {
+      item = await this.prisma.reservation.update({
+        where: { id, ...(expectedStatus ? { status: expectedStatus } : {}) },
+        data: { ...changes, date: dto.date ? new Date(dto.date) : undefined },
+      });
+    } catch (error) {
+      if (expectedStatus && error instanceof PrismaClientKnownRequestError && error.code === 'P2025')
+        throw new ConflictException('Cette réservation a été modifiée par un autre membre de l’équipe. Actualisez la vue.');
+      throw error;
+    }
+    if (!undoAttendance && dto.status && dto.status !== current.status && ['CONFIRMED', 'CANCELLED'].includes(dto.status)) {
       const template = mailTemplates.reservationStatus({
         name: item.name,
         date: new Intl.DateTimeFormat('fr-FR', { dateStyle: 'long' }).format(item.date),

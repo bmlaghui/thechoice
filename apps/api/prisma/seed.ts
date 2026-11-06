@@ -1,17 +1,12 @@
 import 'dotenv/config';
-import argon2 from 'argon2';
+import { seedDevUsers } from './dev-users';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient, Role, PublishStatus, ReservationStatus } from '../src/generated/prisma/client';
 
 const prisma = new PrismaClient({ adapter: new PrismaPg({ connectionString: process.env.DATABASE_URL! }) });
 
 async function main() {
-  const passwordHash = await argon2.hash(process.env.ADMIN_PASSWORD ?? 'ChoiceDev2026!');
-  await prisma.user.upsert({
-    where: { email: 'admin@thechoice.local' },
-    update: {},
-    create: { email: 'admin@thechoice.local', passwordHash, role: Role.SUPER_ADMIN },
-  });
+  await seedDevUsers(prisma, process.env.ADMIN_PASSWORD ?? 'ChoiceDev2026!');
   const rolePolicies=[
     {role:Role.SUPER_ADMIN,label:'Admin',description:'Accès complet à la configuration et à la sécurité.',permissions:['VIEW_CONTENT','MANAGE_CONTENT','MANAGE_PLANNING','MANAGE_MESSAGES','MANAGE_HOURS','MANAGE_USERS','MANAGE_ROLES']},
     {role:Role.ADMIN,label:'Content manager',description:'Gestion éditoriale du menu et de la galerie.',permissions:['VIEW_CONTENT','MANAGE_CONTENT','MANAGE_MESSAGES']},

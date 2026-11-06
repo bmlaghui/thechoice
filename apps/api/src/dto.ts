@@ -36,6 +36,10 @@ export class CreateReservationDto {
   @IsOptional() @IsNumber() submittedAt?: number;
   @IsOptional() @IsString() @MaxLength(2048) turnstileToken?: string;
 }
+export class ReservationSlotsQueryDto {
+  @IsDateString() date!: string;
+  @Type(() => Number) @IsInt() @Min(1) @Max(30) guests = 2;
+}
 export class SpecialOpeningHourDto {
   @IsDateString() date!: string;
   @IsOptional() @IsString() @MaxLength(160) label?: string;
@@ -84,6 +88,8 @@ export class ListQueryDto {
   @Type(() => Number) @IsInt() @Min(1) @IsOptional() page = 1;
   @Type(() => Number) @IsInt() @Min(1) @Max(100) @IsOptional() limit = 20;
   @IsOptional() @IsString() search?: string;
+  @IsOptional() @IsDateString() from?: string;
+  @IsOptional() @IsDateString() to?: string;
   @IsOptional() @IsString() sortBy?: string;
   @IsOptional() @IsIn(['asc', 'desc']) sortOrder: 'asc' | 'desc' = 'asc';
 }
@@ -181,6 +187,7 @@ export class EventOfferDto {
 }
 
 export class ReservationUpdateDto {
+  @IsOptional() @IsEnum(ReservationStatus) expectedStatus?: ReservationStatus;
   @IsOptional() @IsEnum(ReservationStatus) status?: ReservationStatus;
   @IsOptional() @IsString() @MaxLength(3000) internalNotes?: string;
   @IsOptional() @IsDateString() date?: string;

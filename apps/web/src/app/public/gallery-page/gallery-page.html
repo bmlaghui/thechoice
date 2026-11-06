@@ -1,39 +1,125 @@
 <article class="gallery-page">
-
-  <!-- ═══ HEADER ══════════════════════════════════════════════════════════ -->
-  <header class="gal-header" [style.background-image]="hero().imageUrl ? 'linear-gradient(90deg,#030604ee,#03060466),url(&quot;' + hero().imageUrl + '&quot;)' : null">
-    <p class="eyebrow">{{ hero().eyebrow }}</p>
-    <h1 class="gal-title">{{ hero().title }}</h1>
-    <p>{{ hero().text }}</p>
+  <header class="gallery-intro">
+    <div>
+      <p class="eyebrow">{{ hero().eyebrow }} <span aria-hidden="true">/</span> The Choice</p>
+      <h1>{{ hero().title }}</h1>
+      <p class="gallery-description">{{ hero().text }}</p>
+    </div>
+    <div class="intro-aside">
+      <span class="intro-mark" aria-hidden="true">✳</span>
+      <p>Le lieu. Les saveurs.<br />Les moments qu’on garde.</p>
+      <span class="scroll-cue">L’expérience, en images <span aria-hidden="true">↙</span></span>
+    </div>
   </header>
-
-  <!-- ═══ FILTRES ═════════════════════════════════════════════════════════ -->
-  <nav class="gal-tabs" aria-label="Filtres de la galerie">
-    @for (cat of categories(); track cat) {
-      <button
-        type="button"
-        class="gal-tab"
-        [class.active]="activeFilter() === cat"
-        [attr.aria-pressed]="activeFilter() === cat"
-        (click)="activeFilter.set(cat)"
-        [id]="'gal-filter-' + cat.toLowerCase()">
-        {{ cat }}
-      </button>
-    }
-  </nav>
-
-  <!-- ═══ GRILLE ═══════════════════════════════════════════════════════════ -->
-  <section class="gal-grid" aria-label="Photos du restaurant">
-    @for (item of visibleItems(); track item.src) {
-      <figure class="gal-item">
-        <div class="gal-img" [style.background-image]="'url(\'' + item.src + '\')'"
-             role="img" [attr.aria-label]="item.alt">
-          @if (item.caption) {
-            <figcaption class="gal-caption">{{ item.caption }}</figcaption>
-          }
+  <section class="gallery-collection" aria-labelledby="collection-title">
+    <div class="gallery-toolbar">
+      <h2 id="collection-title" class="sr-only">Notre collection de photos</h2>
+      <nav class="gallery-filters" aria-label="Filtrer les photos">
+        @for (category of categories(); track category) {
+          <button
+            type="button"
+            [class.active]="activeFilter() === category"
+            [attr.aria-pressed]="activeFilter() === category"
+            (click)="setFilter(category)"
+          >
+            {{ category
+            }}<span aria-hidden="true">{{ category === 'Tout' ? allItems().length : '' }}</span>
+          </button>
+        }
+      </nav>
+      <p class="collection-count" role="status">
+        {{ photoCount() }} photo{{ photoCount() > 1 ? 's' : '' }}
+      </p>
+    </div>
+    <div class="editorial-grid">
+      @for (item of visibleItems(); track item.src; let index = $index) {
+        <figure class="gallery-photo" [class.gallery-photo--lead]="index === 0">
+          <button
+            type="button"
+            class="photo-open"
+            (click)="openImage(index)"
+            [attr.aria-label]="'Agrandir : ' + (item.caption || item.alt)"
+          >
+            <img
+              [ngSrc]="item.src"
+              fill
+              [priority]="index === 0"
+              [sizes]="
+                index === 0 ? '(max-width: 700px) 100vw, 66vw' : '(max-width: 700px) 50vw, 33vw'
+              "
+              [alt]="item.alt"
+            /><span class="photo-shade" aria-hidden="true"></span
+            ><span class="photo-index" aria-hidden="true">{{
+              (index + 1).toString().padStart(2, '0')
+            }}</span
+            ><span class="photo-zoom" aria-hidden="true">↗</span
+            ><span class="photo-caption"
+              ><small>{{ item.category }}</small
+              ><strong>{{ item.caption || item.alt }}</strong></span
+            >
+          </button>
+        </figure>
+      } @empty {
+        <div class="gallery-empty">
+          <p>Aucune photo dans cette sélection.</p>
+          <button type="button" class="button" (click)="setFilter('Tout')">
+            Voir toutes les photos
+          </button>
         </div>
-      </figure>
-    }
+      }
+    </div>
+    <p class="gallery-hint">
+      <span aria-hidden="true">＋</span> Cliquez sur une photo pour entrer dans les détails.
+    </p>
   </section>
-
+  <section class="gallery-invitation" aria-labelledby="gallery-invitation-title">
+    <div>
+      <p class="eyebrow">La suite se vit à table</p>
+      <h2 id="gallery-invitation-title">
+        Et si le prochain<br />souvenir était le vôtre<span> ?</span>
+      </h2>
+    </div>
+    <div>
+      <p>Une table, quelques proches et le plaisir de se retrouver. On vous garde une place ?</p>
+      <a routerLink="/reservation" class="button"
+        >Réserver une table <span aria-hidden="true">↗</span></a
+      >
+    </div>
+  </section>
 </article>
+<dialog #lightbox class="gallery-lightbox" aria-labelledby="lightbox-title">
+  @if (currentImage(); as item) {
+    <header>
+      <span
+        >{{ item.category }} <span aria-hidden="true">/</span> {{ activeImage() + 1 }} sur
+        {{ visibleItems().length }}</span
+      ><button type="button" autofocus (click)="closeLightbox()" aria-label="Fermer la photo">
+        Fermer <span aria-hidden="true">×</span>
+      </button>
+    </header>
+    <div class="lightbox-image"><img [ngSrc]="item.src" fill sizes="100vw" [alt]="item.alt" /></div>
+    <footer>
+      <div>
+        <h2 id="lightbox-title">{{ item.caption || item.alt }}</h2>
+        <p>{{ item.category }} · The Choice</p>
+      </div>
+      <div class="lightbox-controls">
+        <button
+          type="button"
+          (click)="moveImage(-1)"
+          [disabled]="visibleItems().length < 2"
+          aria-label="Photo précédente"
+        >
+          ←</button
+        ><button
+          type="button"
+          (click)="moveImage(1)"
+          [disabled]="visibleItems().length < 2"
+          aria-label="Photo suivante"
+        >
+          →
+        </button>
+      </div>
+    </footer>
+  }
+</dialog>

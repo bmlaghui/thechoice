@@ -108,19 +108,10 @@ app-menu .items strong {
   color: var(--primary-hover);
 }
 
-input,
-select,
-textarea,
-.booking input,
-.booking select,
-.booking textarea,
-.form-card input,
-.form-card select,
-.form-card textarea {
-  border-radius: 10px !important;
-  border-color: var(--border) !important;
-  background: #141414 !important;
-  transition: border-color .25s ease, box-shadow .25s ease;
+:where(input, select, textarea) {
+  border-color: rgba(255, 255, 255, .15);
+  background: #141414;
+  color: #fff;
 }
 
 input:focus,
@@ -132,7 +123,7 @@ textarea:focus {
   outline-offset: 2px;
 }
 
-footer { background: #040404 !important; }
+.site-footer { background: #040404; }
 footer a { transition: color .25s ease; }
 footer a:hover { color: var(--primary-hover); }
 

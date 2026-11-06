@@ -74,6 +74,14 @@ describe('ReservationAvailabilityService', () => {
     );
   });
 
+  it('allows attendance correction on a past slot but still refuses excess capacity', async () => {
+    const clock = jest.spyOn(Date, 'now').mockReturnValue(Date.parse('2026-11-03T19:30:00Z'));
+    try {
+      await expect(service.assertReservable('2026-11-03', '20:00', 2, 'booking', true)).resolves.toBeUndefined();
+      prisma.reservation.findMany.mockResolvedValue([{ id: 'other', time: '20:00', guests: 40 }]);
+      await expect(service.assertReservable('2026-11-03', '20:00', 2, 'booking', true)).rejects.toThrow('plus assez de places');
+    } finally { clock.mockRestore(); }
+  });
   it('gives an exceptional closure priority over weekly hours', async () => {
     prisma.specialOpeningHour.findUnique.mockResolvedValue({
       label: 'Fermeture privée', opensAt: null, closesAt: null, closed: true, capacityOverride: null,
@@ -85,4 +93,22 @@ describe('ReservationAvailabilityService', () => {
       'fermé',
     );
   });
+  it('uses Paris time for past slots even when the server timezone differs', async () => {
+    const clock = jest.spyOn(Date, 'now').mockReturnValue(Date.parse('2026-11-03T19:15:00Z'));
+    try {
+      const result = await service.slots('2026-11-03', 2);
+      expect(result.slots.some(slot => slot.value === '20:00')).toBe(false);
+      expect(result.slots[0].value).toBe('20:30');
+      await expect(service.assertReservable('2026-11-03', '20:00', 2)).rejects.toThrow('déjà passé');
+    } finally { clock.mockRestore(); }
+  });
+  it('allows remaining slots today when the advance window is zero days', async () => {
+    const clock = jest.spyOn(Date, 'now').mockReturnValue(Date.parse('2026-11-03T10:00:00Z'));
+    prisma.siteSetting.findUnique.mockResolvedValueOnce({ value: { slotMinutes: 30, maxCoversPerSlot: 40, advanceDays: 0, minGuests: 1, maxGuests: 30 } });
+    try {
+      const result = await service.slots('2026-11-03', 2);
+      expect(result.slots[0].value).toBe('12:00');
+    } finally { clock.mockRestore(); }
+  });
+
 });

@@ -105,10 +105,10 @@
   <div class="carousel-wrapper">
     <div #dishTrack class="dish-track" role="list">
       @for (dish of dishes(); track dish.name) {
-        <article class="dish-card" role="listitem">
-          <div class="dish-photo">
-            @if (dish.image) { <img [ngSrc]="dish.image" width="400" height="280" [alt]="dish.name" loading="lazy" /> }
-          </div>
+        <article class="dish-card" [class.dish-card--text]="!dish.image" role="listitem">
+          @if (dish.image) {
+            <div class="dish-photo"><img [ngSrc]="dish.image" width="400" height="280" [alt]="dish.name" loading="lazy" /></div>
+          }
           <div class="dish-body">
             <h3>{{ dish.name }}</h3>
             <p>{{ dish.desc }}</p>

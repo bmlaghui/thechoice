@@ -57,6 +57,7 @@ type ModuleConfig = {
   ],
 })
 export class AdminPage implements OnInit {
+  protected openReservationDesk(): void { void this.router.navigateByUrl('/admin/reservations'); }
   protected readonly Number = Number;
   protected readonly Math = Math;
   protected readonly api = inject(AdminApiService);
@@ -778,11 +779,11 @@ export class AdminPage implements OnInit {
   }
   protected roleLabel(role: string) {
     return role === 'SUPER_ADMIN'
-      ? 'Admin'
+      ? 'Administrateur'
       : role === 'ADMIN'
-        ? 'Content manager'
+        ? 'Gestionnaire de contenu'
         : role === 'EDITOR'
-          ? 'Planning planner'
+          ? 'Gestionnaire des réservations'
           : role;
   }
   protected optionLabel(option: string) {

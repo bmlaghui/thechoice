@@ -39,7 +39,15 @@ une modification des dépendances ou du `Dockerfile.dev`.
 - Swagger : http://localhost:3000/api/docs
 - Mailpit : http://localhost:18025 (SMTP local : `11025`). Les ports peuvent être modifiés via `MAILPIT_UI_PORT` et `SMTP_PORT` dans `.env.development`.
 
-Compte de démonstration : `admin@thechoice.local` / `ChoiceDev2026!` (développement uniquement).
+Comptes de test locaux (créés par le seed, mot de passe `ChoiceDev2026!`) :
+
+| Rôle | E-mail |
+| --- | --- |
+| Administrateur | `admin@thechoice.local` |
+| Gestionnaire de contenu | `contenu@thechoice.local` |
+| Gestionnaire des réservations | `reservations@thechoice.local` |
+
+Le gestionnaire des réservations ouvre directement `/admin/reservations`, l’agenda plein écran. Les comptes de production ont des accès distincts ; le seed de développement refuse de s’exécuter en production.
 
 Routes publiques : `/`, `/restaurant`, `/menu`, `/reservation`, `/events`, `/contact`. Le back-office se trouve sous `/admin`.
 

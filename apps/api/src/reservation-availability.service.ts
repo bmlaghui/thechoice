@@ -43,6 +43,16 @@ export class ReservationAvailabilityService {
     return { source, day: date.getDay(), date };
   }
 
+  private restaurantNow(): number {
+    const parts = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Paris', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hourCycle: 'h23' }).formatToParts(new Date(Date.now()));
+    const part = (name: string) => Number(parts.find(item => item.type === name)?.value);
+    return Date.UTC(part('year'), part('month') - 1, part('day'), part('hour'), part('minute'), part('second'));
+  }
+
+  private serviceTime(date: Date, hours = 0, minutes = 0): number {
+    return Date.UTC(date.getFullYear(), date.getMonth(), date.getDate(), hours, minutes);
+  }
+
   private minutes(value: string) {
     const match = /^([01]\d|2[0-3]):([0-5]\d)$/.exec(value);
     if (!match)
@@ -101,6 +111,7 @@ export class ReservationAvailabilityService {
     time: string,
     guests = 1,
     excludeReservationId?: string,
+    allowPast = false,
   ) {
     const { source, day, date: serviceDate } = this.dateParts(date);
     const timeMinutes = this.minutes(time);
@@ -108,16 +119,16 @@ export class ReservationAvailabilityService {
     if (!enabled) throw new BadRequestException('Les réservations en ligne sont momentanément fermées.');
     if (guests < minGuests || guests > maxGuests)
       throw new BadRequestException(`Le nombre de personnes doit être compris entre ${minGuests} et ${maxGuests}.`);
-    const today = new Date(); today.setHours(0, 0, 0, 0);
-    if (serviceDate.getTime() > today.getTime() + advanceDays * 86_400_000)
+    const now = this.restaurantNow();
+    const today = Math.floor(now / 86_400_000) * 86_400_000;
+    if (this.serviceTime(serviceDate) > today + advanceDays * 86_400_000)
       throw new BadRequestException(`Les réservations sont ouvertes ${advanceDays} jours à l’avance.`);
     if (this.contains(current, timeMinutes)) {
       const start = current?.opensAt ? this.minutes(current.opensAt) : 0;
       const end = current?.closesAt ? this.minutes(current.closesAt) : 0;
       const afterMidnight = end <= start && timeMinutes < end;
-      const slotDate = new Date(serviceDate);
-      slotDate.setHours(Math.floor(timeMinutes / 60) + (afterMidnight ? 24 : 0), timeMinutes % 60, 0, 0);
-      if (slotDate.getTime() <= Date.now())
+      const slotTime = this.serviceTime(serviceDate, Math.floor(timeMinutes / 60) + (afterMidnight ? 24 : 0), timeMinutes % 60);
+      if (slotTime <= now && !allowPast)
         throw new BadRequestException('Ce créneau est déjà passé.');
       const reserved = reservations
         .filter((item) => item.time === time && item.id !== excludeReservationId)
@@ -140,24 +151,24 @@ export class ReservationAvailabilityService {
     const { source, day, date: serviceDate } = this.dateParts(date);
     const { hour: current, reservations, slotMinutes, maxCoversPerSlot, enabled, advanceDays } =
       await this.context(source, day);
+    const now = this.restaurantNow();
     const slots: Array<{ value: string; label: string; nextDay: boolean; remainingCovers: number }> = [];
     const append = (start: number, end: number) => {
       const first = Math.ceil(start / slotMinutes) * slotMinutes;
       for (let value = first; value < end; value += slotMinutes) {
         const time = `${String(Math.floor(value / 60) % 24).padStart(2, '0')}:${String(value % 60).padStart(2, '0')}`;
         const nextDay = value >= 24 * 60;
-        const slotDate = new Date(serviceDate);
-        slotDate.setHours(Math.floor(value / 60), value % 60, 0, 0);
+        const slotTime = this.serviceTime(serviceDate, Math.floor(value / 60), value % 60);
         const reserved = reservations
           .filter((item) => item.time === time && item.id !== excludeReservationId)
           .reduce((total, item) => total + item.guests, 0);
         const remainingCovers = Math.max(0, maxCoversPerSlot - reserved);
-        if (slotDate.getTime() > Date.now() && remainingCovers >= guests)
+        if (slotTime > now && remainingCovers >= guests)
           slots.push({ value: time, label: time, nextDay, remainingCovers });
       }
     };
-    const today = new Date(); today.setHours(0, 0, 0, 0);
-    const withinBookingWindow = serviceDate.getTime() <= today.getTime() + advanceDays * 86_400_000;
+    const today = Math.floor(now / 86_400_000) * 86_400_000;
+    const withinBookingWindow = this.serviceTime(serviceDate) <= today + advanceDays * 86_400_000;
     if (enabled && withinBookingWindow && current && !current.closed && current.opensAt && current.closesAt) {
       const start = this.minutes(current.opensAt);
       const end = this.minutes(current.closesAt);

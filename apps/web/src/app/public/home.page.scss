@@ -1172,3 +1172,37 @@ $text: #ffffff;
 .hero-tagline{margin:0 0 1.2rem;color:#dbe5dc;font-size:clamp(.72rem,1.2vw,.95rem);letter-spacing:.18em;text-transform:uppercase}
 
 .hero-pause { position: absolute; bottom: 24px; right: 24px; z-index: 3; max-width: 180px; padding: 10px 14px; border: 1px solid #ffffff66; border-radius: 3px; background: #030504dd; color: #fff; font-size: 11px; cursor: pointer; }
+
+.dish-card--text { display:flex; align-items:center; min-height:180px; background:radial-gradient(circle at top right,#24472c55,transparent 75%),#0a100c; }
+.dish-card--text .dish-body { padding:26px 22px; }
+@media(max-width:700px) {
+  .hero { min-height:100svh; padding-bottom:86px; }
+  .hero-copy { width:calc(100% - 40px); margin-inline:20px; }
+  .hero-logo { width:min(100%,310px); }
+  .hero-tagline { font-size:13px; line-height:1.7; }
+  .hero-actions { max-width:320px; gap:18px; }
+  .hero-actions .button { min-height:50px; font-size:12px; }
+  .hero-link { min-height:44px; font-size:12px; }
+  .hero-scroll { left:22px; bottom:24px; transform:none; font-size:10px; }
+  .hero-pause { bottom:20px; right:20px; max-width:170px; padding:10px 12px; }
+  .philosophy,.chef { display:flex; flex-direction:column; min-height:0; }
+  .philosophy-image,.chef-image { position:relative; inset:auto; order:-1; width:100%; min-height:300px; aspect-ratio:5/4; }
+  .philosophy-image::after,.chef-image::after { background:linear-gradient(0deg,#050806,transparent 35%); }
+  .philosophy-copy,.chef-copy { width:100%; min-height:0; padding:22px 24px 42px; background:#050806; }
+  .philosophy-copy .muted,.chef-copy .muted,.ambiance-copy .muted { font-size:15px; line-height:1.8; }
+  .text-link { font-size:11px; min-height:42px; align-items:center; }
+  .best-sellers { padding:38px 20px; }
+  .dish-card { flex-basis:84%; }
+  .dish-card h3 { font-size:25px; line-height:1.1; }
+  .dish-body p { font-size:13px; line-height:1.7; }
+  .dish-body strong { font-size:17px; }
+  .ambiance-copy { padding:34px 24px 28px; }
+  .ambiance-shot { min-height:210px; }
+  .booking { padding:38px 20px; }
+  .booking-form { padding:20px 16px; }
+  .booking-form label { font-size:12px; }
+  .booking-form input,.booking-form select { font-size:16px; min-height:48px; }
+  .booking-form .button { font-size:11px; min-height:48px; }
+  .testimonials { min-height:0; padding:48px 20px; }
+  .testimonial-card blockquote { font-size:15px; line-height:1.8; }
+}

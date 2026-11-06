@@ -12,7 +12,7 @@ import { AuthUser, JwtAuthGuard, Roles, RolesGuard } from './auth';
 import { AdminService } from './admin.service';
 import {
   CategoryDto, CreateReservationDto, DishDto, EventInquiryDto, EventOfferDto, GalleryDto, ListQueryDto, MediaAssetDto, OpeningHourDto, SpecialOpeningHourDto,
-  PageDto, ReservationUpdateDto, SettingDto, SocialLinkDto, UserDto, EventInquiryUpdateDto, ReorderCategoriesDto, ReorderDishesDto, ReorderGalleryDto, ReplyMessageDto, UserProfileDto, ChangePasswordDto, RolePolicyDto, ResetUserPasswordDto, TestimonialDto, ReorderTestimonialsDto,
+  PageDto, ReservationSlotsQueryDto, ReservationUpdateDto, SettingDto, SocialLinkDto, UserDto, EventInquiryUpdateDto, ReorderCategoriesDto, ReorderDishesDto, ReorderGalleryDto, ReplyMessageDto, UserProfileDto, ChangePasswordDto, RolePolicyDto, ResetUserPasswordDto, TestimonialDto, ReorderTestimonialsDto,
 } from './dto';
 
 type RequestWithUser = { user: AuthUser };
@@ -76,6 +76,7 @@ export class AdminController {
   @Delete('events/:id') deleteEvent(@Param('id') id: string, @Req() req: RequestWithUser) { return this.service.deleteEvent(id, req.user); }
 
   @Get('reservations') reservations(@Query() q: ListQueryDto) { return this.service.reservations(q); }
+  @Get('reservations/:id/slots') reservationSlots(@Param('id') id: string, @Query() q: ReservationSlotsQueryDto) { return this.service.reservationSlots(id, q); }
   @Post('reservations') createReservation(@Body() dto: CreateReservationDto, @Req() req: RequestWithUser) { return this.service.createReservation(dto, req.user); }
   @Patch('reservations/:id') updateReservation(@Param('id') id: string, @Body() dto: ReservationUpdateDto, @Req() req: RequestWithUser) { return this.service.updateReservation(id, dto, req.user); }
   @Delete('reservations/:id') deleteReservation(@Param('id') id: string, @Req() req: RequestWithUser) { return this.service.deleteReservation(id, req.user); }
