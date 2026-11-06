@@ -21,6 +21,8 @@
 - Configuration Compose stricte, migrations sur base vide, bootstrap administrateur et health checks validés avec les vraies images Docker.
 - Les quatre services de production du VPS sont sains ; migration terminée avec succès.
 - Vérification Chrome du vrai site via un tunnel SSH temporaire : huit pages en 1440 et 390 pixels, HTTP 200, aucune image HTML cassée, aucun débordement horizontal ni exception JavaScript.
+- Redéploiement du même commit validé : sauvegarde PostgreSQL créée avant migration, administrateur existant préservé, services sains.
+- Certificat Let’s Encrypt valide pour `thechoice.mlaghuibrahim.fr`, accueil HTTP 200 en HTTPS vérifié depuis l’extérieur en résolvant directement vers le VPS.
 - Stack de test locale arrêtée après validation ; services de développement conservés.
 
 ## CI/CD
@@ -31,7 +33,7 @@ L’utilisateur a confirmé avoir configuré les quatre secrets Actions : `VPS_H
 
 ## Points en attente
 
-- L’utilisateur a confirmé la création de l’entrée DNS A `thechoice → 217.154.15.174`. Au dernier contrôle, les résolveurs publics et deux serveurs faisant autorité chez IONOS renvoyaient encore NXDOMAIN. L’accès HTTPS public et son certificat ne sont donc pas encore validés ; Caddy les prendra en charge dès que le DNS sera visible.
+- L’entrée DNS A `thechoice → 217.154.15.174` est confirmée directement auprès des serveurs IONOS faisant autorité. Le certificat HTTPS est délivré. Certains résolveurs conservent encore la réponse négative antérieure ; leur cache doit expirer pour un accès normal depuis tous les réseaux.
 - SMTP non fourni : aucune réutilisation des identifiants des autres projets. Les e-mails ne sont pas opérationnels ; configurer le vrai serveur SMTP dans le fichier privé du VPS et recréer l’API. Les rappels sont désactivés en attendant.
 - Turnstile non configuré : clés vides, widget désactivé. Ajouter les vraies clés si souhaité.
 - Compléter les informations légales et valider les contenus avant présentation publique définitive.

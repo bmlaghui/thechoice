@@ -8,6 +8,9 @@ import { resolve } from 'node:path';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  // Production requests cross Caddy and the private Nginx gateway.
+  // Resolve the original visitor IP so rate limits are not shared by all visitors.
+  if (process.env.NODE_ENV === 'production') app.set('trust proxy', 2);
   app.useStaticAssets(resolve(process.env.UPLOAD_DIR??resolve(process.cwd(),'../web/public/uploads')),{prefix:'/uploads/'});
   app.use(helmet({contentSecurityPolicy:{directives:{defaultSrc:["'self'"],imgSrc:["'self'","data:","blob:"],styleSrc:["'self'","'unsafe-inline'"],scriptSrc:["'self'"],connectSrc:["'self'",...(process.env.CORS_ORIGINS??'http://localhost:4200').split(',')]}},strictTransportSecurity:process.env.NODE_ENV==='production'?{maxAge:31_536_000,includeSubDomains:true,preload:true}:false,referrerPolicy:{policy:'strict-origin-when-cross-origin'}}));
   app.use((request:{method:string;url:string;headers:{cookie?:string;'x-csrf-token'?:string}},response:{status:(code:number)=>{json:(body:object)=>void}},next:()=>void)=>{if(['GET','HEAD','OPTIONS'].includes(request.method)||!request.url.startsWith('/api/v1/admin'))return next();const cookie=request.headers.cookie?.split(';').map(v=>v.trim()).find(v=>v.startsWith('tc_csrf='))?.slice(8);if(!cookie||cookie!==request.headers['x-csrf-token'])return response.status(403).json({message:'Jeton CSRF invalide'});next();});
