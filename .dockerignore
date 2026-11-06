@@ -13,3 +13,11 @@ uploads
 ChatGPT Image*.png
 THE_CHOICE_CODEX_MASTER_PROMPT.md
 
+
+.dev
+.aws
+.codex
+.agents
+backups
+*.dump
+*.tar.gz
