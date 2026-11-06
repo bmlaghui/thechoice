@@ -1,0 +1,287 @@
+generator client {
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  moduleFormat = "cjs"
+}
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  SUPER_ADMIN
+  ADMIN
+  EDITOR
+}
+enum ReservationStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+  NO_SHOW
+}
+enum PublishStatus {
+  DRAFT
+  PUBLISHED
+}
+
+model User {
+  id String @id @default(uuid()) @db.Uuid
+  name String?
+  email String @unique
+  passwordHash String
+  role Role @default(EDITOR)
+  active Boolean @default(true)
+  manuallyBlocked Boolean @default(false)
+  failedLoginAttempts Int @default(0)
+  lockedUntil DateTime?
+  lastLoginAt DateTime?
+  passwordChangedAt DateTime @default(now())
+  refreshTokens RefreshToken[]
+  invitations UserInvitation[]
+  auditLogs AuditLog[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+model RolePolicy {
+  id String @id @default(uuid()) @db.Uuid
+  role Role @unique
+  label String
+  description String?
+  permissions String[] @default([])
+  updatedAt DateTime @updatedAt
+}
+model RefreshToken {
+  id String @id @default(uuid()) @db.Uuid
+  tokenHash String @unique
+  expiresAt DateTime
+  userId String @db.Uuid
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userAgent String?
+  ipAddress String?
+  createdAt DateTime @default(now())
+  lastUsedAt DateTime @default(now())
+}
+model UserInvitation {
+  id String @id @default(uuid()) @db.Uuid
+  tokenHash String @unique
+  expiresAt DateTime
+  usedAt DateTime?
+  userId String @db.Uuid
+  user User @relation(fields:[userId],references:[id],onDelete:Cascade)
+  createdAt DateTime @default(now())
+}
+model AuditLog {
+  id String @id @default(uuid()) @db.Uuid
+  action String
+  entity String
+  entityId String?
+  metadata Json?
+  userId String? @db.Uuid
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+  createdAt DateTime @default(now())
+  @@index([entity, entityId])
+}
+model Page {
+  id String @id @default(uuid()) @db.Uuid
+  title String
+  slug String @unique
+  status PublishStatus @default(DRAFT)
+  blocks PageBlock[]
+  seo SeoMetadata?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deletedAt DateTime?
+}
+model PageBlock {
+  id String @id @default(uuid()) @db.Uuid
+  type String
+  content Json
+  order Int @default(0)
+  pageId String @db.Uuid
+  page Page @relation(fields: [pageId], references: [id], onDelete: Cascade)
+}
+model SeoMetadata {
+  id String @id @default(uuid()) @db.Uuid
+  title String
+  description String
+  pageId String @unique @db.Uuid
+  page Page @relation(fields: [pageId], references: [id], onDelete: Cascade)
+}
+model MenuCategory {
+  id String @id @default(uuid()) @db.Uuid
+  name String
+  slug String @unique
+  eyebrow String?
+  description String?
+  imageUrl String?
+  imageAlt String?
+  order Int @default(0)
+  active Boolean @default(true)
+  dishes Dish[]
+}
+model Dish {
+  id String @id @default(uuid()) @db.Uuid
+  name String
+  slug String @unique
+  description String
+  eyebrow String?
+  chefQuote String?
+  badges String[] @default([])
+  price Decimal @db.Decimal(10, 2)
+  ingredients String[]
+  imageUrl String?
+  imageAlt String?
+  available Boolean @default(true)
+  featured Boolean @default(false)
+  vegetarian Boolean @default(false)
+  halal Boolean @default(true)
+  spicy Boolean @default(false)
+  order Int @default(0)
+  categoryId String @db.Uuid
+  category MenuCategory @relation(fields: [categoryId], references: [id])
+  images DishImage[]
+  allergens DishAllergen[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deletedAt DateTime?
+  @@index([categoryId, available, featured])
+}
+model DishImage {
+  id String @id @default(uuid()) @db.Uuid
+  url String
+  alt String
+  order Int @default(0)
+  dishId String @db.Uuid
+  dish Dish @relation(fields: [dishId], references: [id], onDelete: Cascade)
+}
+model Allergen {
+  id String @id @default(uuid()) @db.Uuid
+  name String @unique
+  slug String @unique
+  dishes DishAllergen[]
+}
+model DishAllergen {
+  dishId String @db.Uuid
+  allergenId String @db.Uuid
+  dish Dish @relation(fields: [dishId], references: [id], onDelete: Cascade)
+  allergen Allergen @relation(fields: [allergenId], references: [id], onDelete: Cascade)
+  @@id([dishId, allergenId])
+}
+model GalleryItem {
+  id String @id @default(uuid()) @db.Uuid
+  title String
+  category String
+  imageUrl String
+  alt String
+  order Int @default(0)
+  published Boolean @default(true)
+  createdAt DateTime @default(now())
+}
+model Testimonial {
+  id String @id @default(uuid()) @db.Uuid
+  author String
+  context String
+  quote String
+  rating Int @default(5)
+  avatarUrl String?
+  avatarAlt String?
+  published Boolean @default(true)
+  featured Boolean @default(false)
+  order Int @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@index([published, order])
+}
+model EventOffer {
+  id String @id @default(uuid()) @db.Uuid
+  title String
+  slug String @unique
+  description String
+  imageUrl String?
+  published Boolean @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+model Reservation {
+  id String @id @default(uuid()) @db.Uuid
+  date DateTime
+  time String
+  guests Int
+  name String
+  email String
+  phone String
+  message String?
+  occasion String?
+  status ReservationStatus @default(PENDING)
+  internalNotes String?
+  consent Boolean
+  managementTokenHash String? @unique
+  reminderSentAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@index([date, status])
+  @@index([status, reminderSentAt])
+}
+model ContactMessage {
+  id String @id @default(uuid()) @db.Uuid
+  name String
+  email String
+  phone String?
+  message String
+  read Boolean @default(false)
+  createdAt DateTime @default(now())
+}
+model EventInquiry {
+  id String @id @default(uuid()) @db.Uuid
+  name String
+  email String
+  phone String?
+  eventType String
+  eventDate DateTime?
+  guests Int?
+  message String
+  status String @default("NEW")
+  internalNotes String?
+  createdAt DateTime @default(now())
+  @@index([status, eventDate])
+}
+model OpeningHour {
+  id String @id @default(uuid()) @db.Uuid
+  day Int @unique
+  label String
+  opensAt String?
+  closesAt String?
+  closed Boolean @default(false)
+}
+model SpecialOpeningHour {
+  id String @id @default(uuid()) @db.Uuid
+  date DateTime @unique @db.Date
+  label String?
+  opensAt String?
+  closesAt String?
+  closed Boolean @default(true)
+  capacityOverride Int?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+model SocialLink {
+  id String @id @default(uuid()) @db.Uuid
+  platform String @unique
+  url String
+  active Boolean @default(true)
+}
+model SiteSetting {
+  id String @id @default(uuid()) @db.Uuid
+  key String @unique
+  value Json
+  updatedAt DateTime @updatedAt
+}
+model MediaAsset {
+  id String @id @default(uuid()) @db.Uuid
+  filename String
+  mimeType String
+  size Int
+  url String
+  alt String
+  createdAt DateTime @default(now())
+}

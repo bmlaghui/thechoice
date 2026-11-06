@@ -1,0 +1,25 @@
+@if (dish(); as dish) {
+<article class="dish-page">
+  <nav class="breadcrumb" aria-label="Fil d'Ariane"><a routerLink="/menu">La carte</a><span>—</span><span>{{ dish.name }}</span></nav>
+  <section class="dish-hero">
+    <div class="dish-visual" [style.background-image]="dish.image ? 'url(&quot;' + dish.image + '&quot;)' : 'none'" role="img" [attr.aria-label]="dish.imageAlt"><span class="image-index">The Choice · Signature</span></div>
+    <div class="dish-story">
+      <div class="badges">@for (badge of dish.badges; track badge) { <span>{{ badge }}</span> }</div>
+      <p class="eyebrow">L'assiette du chef</p>
+      <h1>{{ dish.name }}</h1>
+      <p class="price">{{ dish.price }}</p>
+      <p class="description">{{ dish.description }}</p>
+      @if (dish.note) { <blockquote>“{{ dish.note }}”</blockquote> }
+      @if (dish.allergens.length) { <p class="allergens"><span>Allergènes</span>{{ dish.allergens.join(' · ') }}</p> }
+      <button class="favorite-cta" type="button" [class.active]="favorites.isFavorite(dish.slug)" (click)="toggleFavorite(dish)"><span aria-hidden="true">{{ favorites.isFavorite(dish.slug) ? '♥' : '♡' }}</span>{{ favorites.isFavorite(dish.slug) ? 'Ajouté à mes favoris' : 'Ajouter à mes favoris' }}</button>
+    </div>
+  </section>
+  <section class="dish-values" aria-label="Caractéristiques du plat"><div><strong>01</strong><span>Produits frais</span></div><div><strong>02</strong><span>Fait maison</span></div>@if (dish.halal) { <div><strong>03</strong><span>Halal</span></div> }<div><strong>{{ dish.halal ? '04' : '03' }}</strong><span>Qualité premium</span></div></section>
+  <section class="dish-next"><p>Continuer l'expérience</p><h2>Découvrez toute<br>notre carte.</h2><a routerLink="/menu">Retour au menu <span aria-hidden="true">→</span></a></section>
+</article>
+} @else if (loading()) {
+  <main class="dish-page dish-state" aria-busy="true"><p>Chargement du plat…</p></main>
+} @else if (error()) {
+  <main class="dish-page dish-state"><p>{{ error() }}</p><a routerLink="/menu">Retour au menu</a></main>
+}
+<app-favorites-modal />

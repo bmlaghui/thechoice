@@ -1,0 +1,16 @@
+FROM node:24-alpine
+
+RUN corepack enable
+WORKDIR /workspace
+
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY apps/web/package.json apps/web/package.json
+COPY apps/api/package.json apps/api/package.json
+COPY packages/shared-types/package.json packages/shared-types/package.json
+
+RUN --mount=type=cache,id=pnpm-dev-store,target=/pnpm/store \
+    pnpm config set store-dir /pnpm/store && \
+    pnpm install --frozen-lockfile
+
+COPY . .
+

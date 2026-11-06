@@ -1,0 +1,60 @@
+/* High-fidelity layer based on the approved composite wireframe. */
+app-home .hero{background:linear-gradient(90deg,#020403d9 0%,#02150c70 30%,transparent 68%),linear-gradient(0deg,#030504 0%,transparent 32%),url('/images/hero/the-choice-table-user.jpeg') 62% center/cover no-repeat!important}
+app-home .hero-count{position:absolute;left:clamp(22px,4.1vw,60px);top:50%;transform:translateY(-48%);display:grid;gap:25px;font:500 9px 'Inter';color:#89928c}
+app-home .hero-count b{color:#78bf7d}
+app-home .hero-copy{margin-left:clamp(35px,5vw,78px)!important;width:min(43vw,600px)}
+app-home .hero-copy>.eyebrow{display:none}
+app-home .hero-copy h1{margin:0;width:min(100%,570px)}
+app-home .hero-copy h1 img{width:100%;height:auto;filter:drop-shadow(0 8px 25px #000a)}
+app-home .hero .actions{align-items:center;margin-left:7px}
+app-home .discover{display:flex;align-items:center;gap:9px;text-transform:uppercase;font-size:8px;letter-spacing:.09em}
+app-home .discover i{width:28px;height:28px;border:1px solid #ffffff80;border-radius:50%;display:grid;place-items:center;font-size:7px;font-style:normal}
+app-home .story-image{background-image:url('/images/interior.png')!important;background-position:center!important}
+app-home .chef-image{background-image:url('/images/chef.png')!important;background-position:center!important}
+app-home .gallery div{background-image:url('/images/interior.png')!important}
+app-home .gallery div:nth-child(1){background-position:15% center!important}
+app-home .gallery div:nth-child(2){background-position:52% center!important}
+app-home .gallery div:nth-child(3){background-position:88% center!important}
+app-home .dish-photo{height:175px!important;background:none!important;overflow:hidden}
+app-home .dish-photo img{width:100%;height:100%;object-fit:cover;transition:transform .45s}
+app-home .dish-card:hover .dish-photo img{transform:scale(1.035)}
+app-home .dish-card:nth-child(3) .dish-photo img{object-position:51% center;transform:scale(1.65)}
+app-home .dish-card:nth-child(4) .dish-photo img{object-position:92% center;transform:scale(1.65)}
+
+app-restaurant .page-hero{background-image:linear-gradient(90deg,#030504 3%,#06100bc7 38%,transparent 72%),linear-gradient(0deg,#030504,transparent 35%),url('/images/interior.png')!important}
+app-restaurant .mosaic div,app-restaurant .photo{background-image:url('/images/interior.png')!important}
+app-restaurant .mosaic div:nth-child(1){background-position:8% center!important}
+app-restaurant .mosaic div:nth-child(2){background-position:54% center!important}
+app-restaurant .mosaic div:nth-child(3){background-position:92% center!important}
+app-menu .menu-photo{background-image:url('/images/menu-dishes.png')!important;background-size:300% auto!important}
+app-menu .menu-group:nth-child(1) .menu-photo{background-position:left center!important}
+app-menu .menu-group:nth-child(2) .menu-photo{background-position:center center!important}
+app-menu .menu-group:nth-child(3) .menu-photo{background-position:right center!important}
+app-menu .menu-group:nth-child(even) .menu-photo{order:2}
+app-menu .menu-group:nth-child(even) .menu-copy{order:1}
+app-menu .thumb{background-image:url('/images/menu-dishes.png')!important}
+app-events .event{background-image:linear-gradient(90deg,#030504 4%,#030504a8 45%,transparent),url('/images/events/server-dishes.jpg')!important}
+app-reservation .form-page,app-contact .form-page{background-image:linear-gradient(90deg,#030504 12%,#030504b0),url('/images/interior.png')!important}
+app-reservation .form-page{grid-template-columns:minmax(0,620px)!important;justify-content:center;text-align:center;padding-top:125px!important;background-image:linear-gradient(#030504b5,#030504ed),url('/images/interior.png')!important}
+app-reservation .intro .section-title{margin-bottom:8px}
+app-reservation .intro .muted{font-size:10px;line-height:1.65}
+app-reservation .form-card{text-align:left;width:100%;border-radius:7px;border-color:#ffffff20;box-shadow:0 30px 100px #000}
+app-reservation .form-card form{display:grid;grid-template-columns:repeat(2,1fr);gap:0 12px}
+app-reservation .form-card label:nth-child(7),app-reservation .form-card .check,app-reservation .form-card .button{grid-column:1/-1}
+app-contact .form-page{grid-template-columns:minmax(260px,.75fr) minmax(420px,1fr)!important;background-image:linear-gradient(90deg,#030504e8 0%,#030504a5 65%),url('/images/interior.png')!important}
+app-contact .intro{padding:32px;border-left:1px solid #4e8a55}
+
+@media(max-width:700px){
+  app-home .hero{background-position:58% center!important;padding-left:20px!important}
+  app-home .hero:after{content:'';position:absolute;inset:0;background:linear-gradient(0deg,#030504 4%,transparent 45%),linear-gradient(90deg,#02040370,transparent)}
+  app-home .hero-count{display:none}
+  app-home .hero-copy{z-index:2;width:100%;margin:0 0 34px!important}
+  app-home .hero-copy h1{width:min(92vw,430px)}
+  app-home .hero .actions{flex-direction:column;align-items:flex-start;width:auto}
+  app-home .hero .button{width:190px}
+  app-home .scroll{z-index:2}
+  app-home .chef-image{background-position:35% center!important}
+  app-menu .menu-group:nth-child(even) .menu-photo,app-menu .menu-group:nth-child(even) .menu-copy{order:initial}
+  app-reservation .form-card form{display:block}
+  app-contact .form-page{grid-template-columns:1fr!important}
+}

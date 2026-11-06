@@ -1,0 +1,74 @@
+$bg:      #060806;
+$border:  rgba(255,255,255,.1);
+$brand-l: #5cb068;
+$muted:   #a7afa9;
+
+:host { display: block; }
+
+.not-found {
+  position: relative;
+  min-height: 100svh;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background: $bg;
+  overflow: hidden;
+}
+
+// Visuel gauche : fond sombre avec image déco culinaire
+.nf-visual {
+  background:
+    linear-gradient(90deg, transparent 50%, #060806),
+    url('/images/hero/sharing-table-02.jpg') center / cover no-repeat;
+}
+
+// Copy droite
+.nf-copy {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 60px clamp(30px, 6vw, 80px);
+  background: $bg;
+}
+
+.nf-big {
+  margin: 0;
+  font: 800 clamp(140px, 20vw, 280px) / .78 'Bebas Neue', sans-serif;
+  color: rgba(255,255,255,.06);
+  letter-spacing: -.02em;
+  user-select: none;
+}
+
+.nf-title {
+  margin: -20px 0 16px;
+  font: 400 clamp(30px, 4vw, 52px) / 1 'Bebas Neue', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: .02em;
+}
+
+.nf-desc {
+  max-width: 380px;
+  margin: 0 0 28px;
+  color: $muted;
+  font: 400 13px / 1.7 'Manrope', sans-serif;
+}
+
+.nf-actions {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 768px) {
+  .not-found { grid-template-columns: 1fr; }
+  .nf-visual {
+    min-height: 260px;
+    background-image:
+      linear-gradient(0deg, #060806, transparent 60%),
+      url('/images/hero/sharing-table-02.jpg');
+  }
+  .nf-copy { padding: 36px 24px 60px; }
+  .nf-big { font-size: clamp(120px, 30vw, 180px); }
+  .nf-title { font-size: clamp(28px, 7vw, 40px); margin-top: -12px; }
+  .nf-actions { flex-direction: column; .button { width: 100%; } }
+}

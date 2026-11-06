@@ -1,0 +1,140 @@
+<article class="contact-page">
+  <!-- ═══ MAIN — split info / form ═══════════════════════════════════════ -->
+  <main class="contact-main">
+    <!-- Colonne gauche : infos -->
+    <section class="contact-info" [style.background-image]="pageContent().imageUrl ? 'linear-gradient(90deg,#030604ee,#03060477),url(&quot;' + pageContent().imageUrl + '&quot;)' : null">
+      <p class="eyebrow">{{ pageContent().eyebrow }}</p>
+      <h1 class="contact-title">{{ pageContent().title }}</h1>
+      <p class="contact-intro">{{ pageContent().text }}</p>
+
+      <dl class="contact-details">
+        <div>
+          <dt>Téléphone</dt>
+          <dd><a [href]="'tel:' + site.contact().phone">{{ site.contact().phone }}</a></dd>
+        </div>
+        <div>
+          <dt>Email</dt>
+          <dd>
+            <a [href]="'mailto:' + site.contact().email">{{ site.contact().email }}</a>
+          </dd>
+        </div>
+        <div>
+          <dt>Adresse</dt>
+          <dd>{{ site.contact().address }}</dd>
+        </div>
+        <div>
+          <dt>Horaires</dt>
+          <dd>
+            @for (group of site.hourGroups(); track group.label) {
+              <span>{{ group.label }} · {{ group.hours }}</span>@if (!$last) { <br /> }
+            } @empty {
+              Horaires momentanément indisponibles
+            }
+          </dd>
+        </div>
+      </dl>
+
+      <div class="contact-socials">
+        <a
+          [href]="site.socialUrl('instagram')"
+          target="_blank"
+          rel="noreferrer"
+          class="social-link"
+          id="lnk-instagram" aria-label="Instagram"
+        >
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <rect
+              x="2"
+              y="2"
+              width="20"
+              height="20"
+              rx="5"
+              stroke="currentColor"
+              stroke-width="1.5"
+            />
+            <circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="1.5" />
+            <circle cx="17.5" cy="6.5" r="1" fill="currentColor" />
+          </svg>
+        </a>
+        <a
+          [href]="site.socialUrl('tiktok')"
+          target="_blank"
+          rel="noreferrer"
+          class="social-link"
+          id="lnk-tiktok" aria-label="TikTok"
+        >
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path
+              d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </a>
+        <a
+          [href]="site.socialUrl('facebook')"
+          target="_blank"
+          rel="noreferrer"
+          class="social-link"
+          id="lnk-facebook" aria-label="Facebook"
+        >
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path
+              d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3V2Z"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </a>
+      </div>
+    </section>
+
+    <!-- Colonne droite : formulaire -->
+    <section class="contact-form-wrap" aria-label="Formulaire de contact">
+      @if (sent()) {
+        <div class="contact-sent" role="status">
+          <span class="sent-icon" aria-hidden="true">✓</span>
+          <h2>Message envoyé</h2>
+          <p>Notre équipe vous répondra dans les meilleurs délais.</p>
+        </div>
+      } @else {
+        <form class="contact-form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+          <label class="contact-trap" aria-hidden="true">Site web<input formControlName="website" tabindex="-1" autocomplete="off" /></label>
+          <label for="c-name">
+            Nom
+            <input id="c-name" formControlName="name" placeholder="Votre nom complet" />
+          </label>
+          <label for="c-email">
+            Email
+            <input id="c-email" type="email" formControlName="email" placeholder="votre@email.fr" />
+          </label>
+          <label for="c-phone">
+            Téléphone <span class="optional">(optionnel)</span>
+            <input id="c-phone" type="tel" formControlName="phone" placeholder="06 00 00 00 00" />
+          </label>
+          <label for="c-msg">
+            Votre message
+            <textarea
+              id="c-msg"
+              formControlName="message"
+              rows="7"
+              placeholder="Comment pouvons-nous vous aider ?"
+            ></textarea>
+          </label>
+          @if(error()){<p class="contact-error" role="alert">{{error()}}</p>}
+          <app-turnstile (tokenChange)="turnstileToken.set($event)" />
+          <button class="button contact-submit" type="submit" id="btn-envoyer-message" [disabled]="sending() || (site.turnstileSiteKey() && !turnstileToken())">
+            {{sending()?'Envoi…':'Envoyer le message'}}
+          </button>
+        </form>
+      }
+    </section>
+  </main>
+
+  <!-- ═══ MAP PANORAMA ════════════════════════════════════════════════════ -->
+  <app-restaurant-map [address]="site.contact().address" [latitude]="site.contact().latitude" [longitude]="site.contact().longitude" />
+</article>

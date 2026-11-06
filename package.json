@@ -1,0 +1,17 @@
+{
+  "name": "the-choice",
+  "private": true,
+  "packageManager": "pnpm@10.13.1",
+  "scripts": {
+    "dev": "pnpm --parallel --filter @the-choice/api --filter @the-choice/web start:dev",
+    "build": "pnpm -r build",
+    "test": "pnpm -r test -- --runInBand",
+    "lint": "pnpm -r lint",
+    "db:generate": "pnpm --filter @the-choice/api prisma:generate",
+    "db:migrate": "pnpm --filter @the-choice/api prisma:migrate",
+    "db:seed": "pnpm --filter @the-choice/api prisma:seed"
+  },
+  "devDependencies": {
+    "prettier": "^3.6.2"
+  }
+}

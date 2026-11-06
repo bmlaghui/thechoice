@@ -1,0 +1,15 @@
+<article class="legal-page">
+  <header class="legal-header"><h1 class="legal-title">{{ title() }}</h1></header>
+  <div class="legal-content">
+    <section class="legal-section">
+      <h2>{{ privacy ? 'Utilisation de vos données' : 'Informations légales' }}</h2>
+      <p class="cms-body">{{ body() }}</p>
+    </section>
+    <section class="legal-section">
+      <h2>Contact</h2>
+      <p>{{ site.identity().name }} · {{ site.contact().address }}</p>
+      <p><a [href]="'mailto:' + site.contact().email">{{ site.contact().email }}</a> · <a [href]="'tel:' + site.contact().phone">{{ site.contact().phone }}</a></p>
+    </section>
+    <div class="legal-back"><a class="button secondary" routerLink="/">← Retour à l’accueil</a></div>
+  </div>
+</article>

@@ -1,0 +1,25 @@
+<article class="quote-page">
+  <header class="quote-intro" [style.background-image]="pageContent().imageUrl ? 'linear-gradient(90deg,#030604ee,#03060466),url(&quot;' + pageContent().imageUrl + '&quot;)' : null"><p class="eyebrow">{{pageContent().eyebrow}}</p><h1>{{pageContent().title}}</h1><p>{{pageContent().text}}</p><div class="quote-points"><span><b>01</b>Réponse personnalisée</span><span><b>02</b>Accompagnement dédié</span><span><b>03</b>Devis sans engagement</span></div><a routerLink="/events">Découvrir nos événements <span>→</span></a></header>
+  <main class="quote-form-wrap">
+    @if(sent()){
+      <div class="quote-success" role="status"><span>✓</span><p class="eyebrow">Demande transmise</p><h2>Votre projet commence ici.</h2><p>Notre équipe événementielle vous recontactera rapidement avec une première proposition.</p><a routerLink="/">Retour à l'accueil</a></div>
+    }@else{
+      <div class="form-heading"><span>01 — Votre projet</span><h2>Quelques détails<br>pour commencer.</h2></div>
+      <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+        <label hidden aria-hidden="true">Site web<input formControlName="website" tabindex="-1" autocomplete="off"></label>
+        <label>Type d'événement<select formControlName="eventType"><option>Anniversaire</option><option>Repas d'affaires</option><option>Soirée privée</option><option>Mariage</option><option>Autre événement</option></select></label>
+        <label>Date souhaitée<input type="date" formControlName="date" [min]="minDate"></label>
+        <label>Nombre d'invités<input type="number" min="8" formControlName="guests"></label>
+        <label>Budget indicatif<select formControlName="budget"><option value="">À définir ensemble</option><option>Moins de 2 000 €</option><option>2 000 € – 5 000 €</option><option>Plus de 5 000 €</option></select></label>
+        <div class="form-separator"><span>02 — Vos coordonnées</span></div>
+        <label>Nom complet<input formControlName="name" placeholder="Votre nom"></label>
+        <label>Email<input type="email" formControlName="email" placeholder="vous@email.fr"></label>
+        <label>Téléphone<input type="tel" formControlName="phone" placeholder="06 00 00 00 00"></label>
+        <label class="wide">Votre vision<textarea rows="5" formControlName="message" placeholder="Ambiance, menu, contraintes particulières…"></textarea></label>
+        @if(error()){<p class="wide" role="alert">{{error()}}</p>}
+        <app-turnstile class="wide" (tokenChange)="turnstileToken.set($event)" />
+        <button class="button wide" type="submit" [disabled]="sending() || (site.turnstileSiteKey() && !turnstileToken())">{{sending()?'Envoi…':'Recevoir mon devis personnalisé'}}</button>
+      </form>
+    }
+  </main>
+</article>

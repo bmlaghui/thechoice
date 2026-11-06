@@ -1,0 +1,142 @@
+name: The Choice CI/CD
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: thechoice-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  NODE_VERSION: 24
+  IMAGE_TAG: ${{ github.sha }}
+
+jobs:
+  verify:
+    name: Tests et builds
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.13.1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @the-choice/api prisma:generate
+        env:
+          DATABASE_URL: postgresql://ci:ci@localhost:5432/thechoice
+      - run: pnpm --filter @the-choice/api exec tsc -p tsconfig.json --noEmit --pretty false
+      - run: pnpm --filter @the-choice/api test --runInBand
+      - run: pnpm --filter @the-choice/web test --watch=false
+      - run: pnpm build
+
+  images:
+    name: Images de production et smoke test
+    needs: verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configuration temporaire de test
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import secrets
+          values = {}
+          for line in Path('.env.prod.example').read_text().splitlines():
+              if not line or line.startswith('#'): continue
+              key, value = line.split('=', 1)
+              values[key] = value
+          password = secrets.token_hex(24)
+          values.update(POSTGRES_PASSWORD=password,
+                        DATABASE_URL=f'postgresql://thechoice_prod:{password}@postgres:5432/thechoice',
+                        JWT_SECRET=secrets.token_hex(48), JWT_REFRESH_SECRET=secrets.token_hex(48),
+                        ADMIN_PASSWORD=secrets.token_hex(24),
+                        SMTP_HOST='127.0.0.1', SMTP_USER='', SMTP_PASSWORD='',
+                        TURNSTILE_SITE_KEY='', TURNSTILE_SECRET_KEY='', REMINDERS_ENABLED='false')
+          Path('.env.prod').write_text(''.join(f'{k}={v}\n' for k,v in values.items()))
+          PY
+      - run: make prod-check
+      - run: docker compose --env-file .env.prod -f docker-compose.prod.yml build api web
+      - name: Migrations, démarrage et contrôle HTTP
+        shell: bash
+        run: |
+          docker compose --env-file .env.prod -f docker-compose.prod.yml up -d --no-build --wait --wait-timeout 240
+          docker compose --env-file .env.prod -f docker-compose.prod.yml run --rm --no-deps api node dist/src/bootstrap-admin.js
+          for path in / /restaurant /menu /reservation /gallery /api/v1/health /api/v1/testimonials; do
+            curl --fail --silent --show-error --max-time 30 -H 'Host: thechoice.mlaghuibrahim.fr' "http://127.0.0.1:8084$path" >/dev/null
+          done
+      - name: Préparer les images testées et les sources du commit
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        run: |
+          docker save "thechoice/api:$IMAGE_TAG" "thechoice/web:$IMAGE_TAG" | gzip -1 > /tmp/thechoice-images.tar.gz
+          git archive --format=tar.gz --output=/tmp/thechoice-source.tar.gz HEAD
+      - uses: actions/upload-artifact@v4
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        with:
+          name: thechoice-release-${{ github.sha }}
+          path: |
+            /tmp/thechoice-images.tar.gz
+            /tmp/thechoice-source.tar.gz
+          retention-days: 3
+          compression-level: 0
+      - name: Diagnostics en cas d’échec
+        if: failure()
+        run: docker compose --env-file .env.prod -f docker-compose.prod.yml logs --tail=80
+      - name: Nettoyage du test
+        if: always()
+        run: docker compose --env-file .env.prod -f docker-compose.prod.yml down --volumes --remove-orphans
+
+  deploy:
+    name: Déploiement IONOS
+    needs: images
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      VPS_HOST: ${{ secrets.VPS_HOST }}
+      VPS_USER: ${{ secrets.VPS_USER }}
+      VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
+      VPS_APP_DIR: ${{ secrets.VPS_THECHOICE_APP_DIR }}
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: thechoice-release-${{ github.sha }}
+          path: /tmp/thechoice-release
+      - name: Préparer SSH
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$VPS_HOST" =~ ^[a-zA-Z0-9.-]+$ ]]
+          [[ "$VPS_USER" =~ ^[a-zA-Z0-9_-]+$ ]]
+          [[ "$VPS_APP_DIR" =~ ^/[a-zA-Z0-9/_-]+$ ]]
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$VPS_SSH_KEY" > ~/.ssh/thechoice_deploy
+          chmod 600 ~/.ssh/thechoice_deploy
+          ssh-keyscan -T 15 -H "$VPS_HOST" > ~/.ssh/known_hosts
+          test -s ~/.ssh/known_hosts
+      - name: Transférer et activer la release
+        shell: bash
+        run: |
+          set -euo pipefail
+          release="$VPS_APP_DIR/releases/$GITHUB_SHA-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT"
+          ssh_opts=(-i ~/.ssh/thechoice_deploy -o BatchMode=yes -o StrictHostKeyChecking=yes -o ConnectTimeout=15 -o ServerAliveInterval=30)
+          ssh "${ssh_opts[@]}" "$VPS_USER@$VPS_HOST" "umask 077; mkdir -p '$VPS_APP_DIR/releases'; mkdir '$release'"
+          scp "${ssh_opts[@]}" /tmp/thechoice-release/thechoice-source.tar.gz "$VPS_USER@$VPS_HOST:$release/source.tar.gz"
+          gzip -dc /tmp/thechoice-release/thechoice-images.tar.gz | ssh "${ssh_opts[@]}" "$VPS_USER@$VPS_HOST" 'docker load'
+          ssh "${ssh_opts[@]}" "$VPS_USER@$VPS_HOST" "set -eu; cd '$release'; tar -xzf source.tar.gz; rm source.tar.gz; THECHOICE_ROOT='$VPS_APP_DIR' RELEASE_SHA='$GITHUB_SHA' bash scripts/deploy-release.sh"
+      - name: Nettoyer la clé de session
+        if: always()
+        run: rm -f ~/.ssh/thechoice_deploy

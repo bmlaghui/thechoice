@@ -1,0 +1,363 @@
+$bg:         #060806;
+$card:       #0a0f0b;
+$border:     rgba(255,255,255,.1);
+$brand:      #3a8a4a;
+$brand-l:    #5cb068;
+$muted:      #a7afa9;
+
+:host { display: block; background: $bg; color: #fff; }
+
+// ─── Tokens helpers ───────────────────────────────────────────────────────────
+.eyebrow {
+  margin: 0;
+  color: $brand-l;
+  font: 600 11px / 1 'Manrope', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: .18em;
+}
+
+.r-title {
+  margin: 12px 0 18px;
+  font: 400 clamp(42px, 5vw, 66px) / .92 'Bebas Neue', sans-serif;
+  letter-spacing: .01em;
+  text-transform: uppercase;
+
+  em { color: $brand-l; font-style: normal; }
+}
+
+.r-muted {
+  color: $muted;
+  font: 400 14px / 1.72 'Manrope', sans-serif;
+}
+
+.r-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid $brand-l;
+  color: #fff;
+  font: 600 11px / 1 'Manrope', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+
+  span { color: $brand-l; font-size: 15px; }
+}
+
+// ═══ HERO ════════════════════════════════════════════════════════════════════
+.r-hero {
+  min-height: 440px;
+  padding: 140px clamp(28px, 7vw, 110px) 64px;
+  display: flex;
+  align-items: flex-end;
+  border-bottom: 1px solid $border;
+  background:
+    linear-gradient(90deg, #050706ee 0%, #05070655 50%, transparent 80%),
+    linear-gradient(0deg, #050706cc, transparent 50%),
+    url('/images/interior.png') center 55% / cover no-repeat;
+}
+
+.r-hero-copy {
+  max-width: 560px;
+
+  .r-title { margin: 12px 0 16px; }
+}
+
+.r-hero-desc {
+  max-width: 400px;
+  margin: 0;
+  color: #c5c9c6;
+  font: 400 14px / 1.65 'Manrope', sans-serif;
+}
+
+// ═══ GALERIE SALLE ═══════════════════════════════════════════════════════════
+.r-gallery-section { border-bottom: 1px solid $border; background: $bg; }
+.r-gallery-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 34px clamp(28px, 6vw, 90px) 26px;
+  h2 { margin: 7px 0 0; font: 400 clamp(32px, 4vw, 52px)/.9 'Bebas Neue', sans-serif; text-transform: uppercase; }
+  .r-link { margin: 0 0 5px; }
+}
+.r-gallery {
+  height: 320px;
+  display: grid;
+  grid-template-columns: 1.6fr 1fr 1fr;
+  gap: 2px;
+  background: $bg;
+}
+
+.r-gal-item {
+  position: relative;
+  display: block;
+  background-image: url('/images/interior.png');
+  background-repeat: no-repeat;
+  background-size: cover;
+  transition: filter .25s, transform .4s;
+
+  &::after { content: 'Voir'; position: absolute; inset: 50% auto auto 50%; padding: 9px 14px; border: 1px solid #ffffff80; color: #fff; background: #040604aa; font: 600 9px 'Manrope', sans-serif; text-transform: uppercase; letter-spacing: .12em; opacity: 0; transform: translate(-50%, -40%); transition: .25s; }
+  &:hover { filter: brightness(.82); }
+  &:hover::after, &:focus-visible::after { opacity: 1; transform: translate(-50%, -50%); }
+
+  &.r-gal--1 { background-position: center; }
+  &.r-gal--2 { background-position: center; }
+  &.r-gal--3 { background-position: right 55%; }
+}
+
+// ═══ CHIFFRES ════════════════════════════════════════════════════════════════
+.r-stats {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  padding: 26px clamp(28px, 5vw, 80px);
+  border-bottom: 1px solid $border;
+  background: #050705;
+  text-align: center;
+
+  div {
+    display: grid;
+    gap: 6px;
+    place-content: center;
+    border-right: 1px solid $border;
+
+    &:last-child { border: 0; }
+  }
+
+  strong {
+    font: 700 clamp(18px, 2vw, 26px) / 1 'Bebas Neue', sans-serif;
+    letter-spacing: .04em;
+  }
+
+  span {
+    color: $muted;
+    font: 500 10px / 1 'Manrope', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+  }
+}
+
+// ═══ VALEURS ════════════════════════════════════════════════════════════════
+.r-values {
+  border-bottom: 1px solid $border;
+  background: linear-gradient(180deg, #080d0a, #060806);
+}
+
+.r-values-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border-top: 1px solid $border;
+
+  article {
+    display: grid;
+    place-content: center;
+    text-align: center;
+    padding: 32px 20px;
+    border-right: 1px solid $border;
+
+    &:last-child { border-right: 0; }
+
+    svg {
+      width: 42px;
+      height: 42px;
+      margin: 0 auto 14px;
+      color: $brand;
+    }
+
+    h3 {
+      margin: 0 0 6px;
+      font: 600 12px / 1 'Manrope', sans-serif;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+    }
+
+    p {
+      margin: 0;
+      max-width: 160px;
+      color: $muted;
+      font: 400 11px / 1.5 'Manrope', sans-serif;
+    }
+  }
+}
+
+// ═══ VIDÉO ═══════════════════════════════════════════════════════════════════
+.r-video {
+  height: 450px;
+  display: grid;
+  grid-template-columns: 1fr 1.5fr;
+  border-bottom: 1px solid $border;
+}
+
+.r-video-brand,
+.r-video-scene {
+  position: relative;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(#07100baa, #07100baa),
+              url('/images/restaurant/unnamed.webp') center / cover;
+}
+
+.r-video-brand {
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 24px;
+    border: 1px solid rgba(255,255,255,.1);
+    pointer-events: none;
+  }
+
+  img {
+    position: relative;
+    z-index: 1;
+    width: min(55%, 280px);
+    height: auto;
+    filter: drop-shadow(0 8px 30px #000a);
+  }
+}
+
+.r-video-scene {
+  overflow: hidden;
+  background-image:
+    linear-gradient(#02040348, #02040348),
+    url('/images/interior.png');
+  background-position: 60% center;
+  background-size: cover;
+}
+
+.r-video-player {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background: #020302;
+}
+
+.r-play {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  place-content: center;
+  gap: 10px;
+  width: 108px;
+  height: 108px;
+  color: #fff;
+  background: rgba(5,7,6,.6);
+  border: 1px solid rgba(255,255,255,.7);
+  border-radius: 50%;
+  backdrop-filter: blur(5px);
+  cursor: pointer;
+  transition: .25s;
+
+  &:hover { background: $brand; transform: scale(1.07); }
+}
+
+.r-play-icon { font-size: 22px; }
+
+.r-play small {
+  text-transform: uppercase;
+  font: 500 8px / 1 'Manrope', sans-serif;
+  letter-spacing: .12em;
+}
+
+// ═══ CTA BAND — L'art de recevoir ═══════════════════════════════════════════
+.r-cta-band {
+  position: relative;
+  min-height: 520px;
+  overflow: hidden;
+  border-bottom: 1px solid $border;
+  background: #050806;
+}
+
+.r-cta-copy {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 62%;
+  min-height: 520px;
+  padding: 60px clamp(28px, 6vw, 90px);
+  background: linear-gradient(90deg,#050806 0%,rgba(5,8,6,.98) 58%,rgba(5,8,6,.64) 82%,transparent);
+}
+
+.r-cta-actions {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  margin-top: 22px;
+}
+
+.r-cta-visual {
+  position: absolute;
+  inset: 0 0 0 28%;
+  background:
+    linear-gradient(90deg,#050806 0%,rgba(5,8,6,.58) 20%,transparent 52%),
+    url('/images/hero/sharing-table-01.jpg') center / cover;
+  transition: transform .8s ease;
+}
+.r-cta-band:hover .r-cta-visual { transform: scale(1.025); }
+
+// ═══ PRIVATISATION ══════════════════════════════════════════════════════════
+.r-private {
+  position: relative;
+  min-height: 500px;
+  overflow: hidden;
+  border-bottom: 1px solid $border;
+  background: #050706;
+}
+
+.r-private-photo {
+  position: absolute;
+  inset: 0 26% 0 0;
+  background:
+    linear-gradient(90deg,transparent 42%,rgba(5,7,6,.72) 76%,#050706),
+    url('/images/events/server-dishes.jpg') center / cover;
+  transition: transform .8s ease;
+}
+.r-private:hover .r-private-photo { transform: scale(1.025); }
+
+.r-private-copy {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  width: 58%;
+  min-height: 500px;
+  margin-left: auto;
+  padding: 50px clamp(28px, 6vw, 90px);
+  background: linear-gradient(90deg,transparent 0%,rgba(5,7,6,.84) 20%,#050706 52%);
+
+  .r-title   { margin: 10px 0 16px; }
+  .r-muted   { max-width: 460px; margin-bottom: 22px; }
+}
+
+// ═══ RESPONSIVE ═════════════════════════════════════════════════════════════
+@media (max-width: 768px) {
+  .r-hero { min-height: 480px; padding: 110px 24px 44px; background-position: 65% center; }
+  .r-hero-copy .r-title { font-size: 48px; }
+  .r-gallery { height: auto; grid-template-columns: 1fr 1fr; }
+  .r-gallery-heading { align-items: flex-start; flex-direction: column; }
+  .r-gal-item { min-height: 180px; }
+  .r-gal--1 { grid-column: 1 / -1; min-height: 240px; }
+  .r-stats { grid-template-columns: 1fr 1fr; gap: 18px; padding: 24px 20px; }
+  .r-stats div { border: 0; }
+  .r-values-grid { grid-template-columns: 1fr 1fr; }
+  .r-values-grid article:nth-child(2) { border-right: 0; }
+  .r-values-grid article:nth-child(4) { border-right: 0; }
+  .r-video { height: auto; grid-template-columns: 1fr; }
+  .r-video-brand, .r-video-scene { min-height: 270px; }
+  .r-cta-band { min-height: 620px; }
+  .r-cta-visual { inset: 0; }
+  .r-cta-copy { width:100%;min-height:620px;padding:44px 24px;justify-content:flex-end;background:linear-gradient(0deg,#050806 0%,rgba(5,8,6,.96) 44%,transparent 78%); }
+  .r-private { min-height:620px; }
+  .r-private-photo {
+    inset:0;
+    background-image: linear-gradient(0deg, #080b09, transparent 55%),
+                      url('/images/events/server-dishes.jpg');
+  }
+  .r-private-copy { width:100%;min-height:620px;margin:0;padding:24px 24px 44px;justify-content:flex-end;background:linear-gradient(0deg,#050706 0%,rgba(5,7,6,.96) 44%,transparent 78%); }
+}

@@ -1,0 +1,93 @@
+<article class="menu-page">
+  <header class="menu-hero">
+    <div class="menu-hero-image" [style.background-image]="hero().imageUrl ? 'url(&quot;' + hero().imageUrl + '&quot;)' : null" aria-hidden="true"></div>
+    <div class="menu-hero-copy">
+      <p class="eyebrow">{{ hero().eyebrow }}</p>
+      <h1>{{ hero().title }}</h1>
+      <p>{{ hero().text }}</p>
+      <a href="#carte">Explorer la carte <span aria-hidden="true">↓</span></a>
+    </div>
+    <div class="menu-hero-note">
+      <span>Créations</span><strong>Maison</strong><small>Produits frais · Cuisine halal</small>
+    </div>
+  </header>
+
+  <section id="carte" class="menu-experience">
+    @if (loading()) { <p class="menu-state" aria-busy="true">Chargement de la carte…</p> }
+    @if (error()) { <p class="menu-state error" role="alert">{{ error() }}</p> }
+    <nav class="category-rail" aria-label="Catégories du menu">
+      <p>La carte</p>
+      @for (category of categories(); track category; let index = $index) {
+        <button
+          type="button"
+          [class.active]="active() === category"
+          (click)="selectCategory(category)"
+          [attr.aria-pressed]="active() === category"
+        >
+          <span>0{{ index + 1 }}</span
+          >{{ category }}
+        </button>
+      }
+    </nav>
+
+    @if (activeSection(); as section) {
+      <div class="menu-content" [attr.data-category]="section.category">
+        <header class="category-header">
+          <div>
+            <p class="eyebrow">{{ section.eyebrow }}</p>
+            <h2>{{ section.title }}</h2>
+            <p>{{ section.intro }}</p>
+          </div>
+          <div
+            class="category-visual"
+            [style.background-image]="'url(&quot;' + section.image + '&quot;)'"
+            role="img"
+            [attr.aria-label]="section.title"
+          ></div>
+        </header>
+
+        <div class="dish-grid">
+          @for (dish of section.dishes; track dish.name; let index = $index) {
+            <article class="dish-card" [style.--delay]="index * 70 + 'ms'">
+              <a
+                class="dish-image"
+                [routerLink]="['/menu', section.slug, dish.slug]"
+                [style.background-image]="'url(&quot;' + dish.image + '&quot;)'"
+                [attr.aria-label]="'Découvrir ' + dish.name"
+                ><span>Découvrir</span></a
+              >
+              <button
+                class="heart"
+                type="button"
+                [class.active]="favorites.isFavorite(dish.slug)"
+                (click)="toggleFavorite(dish, section)"
+                [attr.aria-label]="
+                  favorites.isFavorite(dish.slug)
+                    ? 'Retirer des favoris'
+                    : 'Ajouter aux favoris'
+                "
+              >
+                <span aria-hidden="true">{{
+                  favorites.isFavorite(dish.slug) ? '♥' : '♡'
+                }}</span>
+              </button>
+              <div class="dish-copy">
+                <div>
+                  <p>Signature {{ index + 1 }}</p>
+                  <h3>
+                    <a [routerLink]="['/menu', section.slug, dish.slug]">{{
+                      dish.name
+                    }}</a>
+                  </h3>
+                </div>
+                <strong>{{ dish.price }}</strong>
+                <p class="dish-description">{{ dish.description }}</p>
+              </div>
+            </article>
+          }
+        </div>
+      </div>
+    }
+  </section>
+</article>
+<app-favorites-modal />

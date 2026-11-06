@@ -1,0 +1,5 @@
+# Append to the existing Caddyfile. Keep all other sites.
+thechoice.mlaghuibrahim.fr {
+    encode zstd gzip
+    reverse_proxy 127.0.0.1:8084
+}

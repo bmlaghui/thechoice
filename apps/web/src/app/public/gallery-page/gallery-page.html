@@ -1,0 +1,39 @@
+<article class="gallery-page">
+
+  <!-- ═══ HEADER ══════════════════════════════════════════════════════════ -->
+  <header class="gal-header" [style.background-image]="hero().imageUrl ? 'linear-gradient(90deg,#030604ee,#03060466),url(&quot;' + hero().imageUrl + '&quot;)' : null">
+    <p class="eyebrow">{{ hero().eyebrow }}</p>
+    <h1 class="gal-title">{{ hero().title }}</h1>
+    <p>{{ hero().text }}</p>
+  </header>
+
+  <!-- ═══ FILTRES ═════════════════════════════════════════════════════════ -->
+  <nav class="gal-tabs" aria-label="Filtres de la galerie">
+    @for (cat of categories(); track cat) {
+      <button
+        type="button"
+        class="gal-tab"
+        [class.active]="activeFilter() === cat"
+        [attr.aria-pressed]="activeFilter() === cat"
+        (click)="activeFilter.set(cat)"
+        [id]="'gal-filter-' + cat.toLowerCase()">
+        {{ cat }}
+      </button>
+    }
+  </nav>
+
+  <!-- ═══ GRILLE ═══════════════════════════════════════════════════════════ -->
+  <section class="gal-grid" aria-label="Photos du restaurant">
+    @for (item of visibleItems(); track item.src) {
+      <figure class="gal-item">
+        <div class="gal-img" [style.background-image]="'url(\'' + item.src + '\')'"
+             role="img" [attr.aria-label]="item.alt">
+          @if (item.caption) {
+            <figcaption class="gal-caption">{{ item.caption }}</figcaption>
+          }
+        </div>
+      </figure>
+    }
+  </section>
+
+</article>

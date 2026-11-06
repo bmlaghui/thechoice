@@ -1,0 +1,109 @@
+name: thechoice-prod
+
+services:
+  postgres:
+    image: postgres:18-alpine
+    container_name: thechoice-db-prod
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - postgres_prod:/var/lib/postgresql
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    logging: &logging
+      driver: json-file
+      options: { max-size: "10m", max-file: "3" }
+    networks: [thechoice-prod]
+
+  api:
+    build: { context: ., dockerfile: apps/api/Dockerfile }
+    image: thechoice/api:${IMAGE_TAG:-latest}
+    container_name: thechoice-api-prod
+    env_file: ${PROD_ENV_FILE:-.env.prod}
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: ${DATABASE_URL}
+      UPLOAD_DIR: /app/uploads
+      NODE_PATH: /app/apps/api/node_modules
+    expose: ["3000"]
+    volumes:
+      - uploads_prod:/app/uploads
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+    restart: unless-stopped
+    init: true
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3000/api/v1/health || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 25s
+    logging: *logging
+    networks: [thechoice-prod]
+
+  migrate:
+    image: thechoice/api:${IMAGE_TAG:-latest}
+    container_name: thechoice-migrate-prod
+    env_file: ${PROD_ENV_FILE:-.env.prod}
+    environment: { DATABASE_URL: "${DATABASE_URL}" }
+    command: ["apps/api/node_modules/.bin/prisma", "migrate", "deploy", "--config", "prisma.config.ts"]
+    depends_on:
+      postgres: { condition: service_healthy }
+    restart: "no"
+    networks: [thechoice-prod]
+
+  web:
+    build: { context: ., dockerfile: apps/web/Dockerfile }
+    image: thechoice/web:${IMAGE_TAG:-latest}
+    container_name: thechoice-web-prod
+    environment:
+      NODE_ENV: production
+      PORT: 4000
+      NG_ALLOWED_HOSTS: "${APP_DOMAIN:-thechoice.mlaghuibrahim.fr},localhost,web"
+      NG_TRUST_PROXY_HEADERS: "X-FORWARDED-HOST,X-FORWARDED-PROTO"
+    expose: ["4000"]
+    depends_on:
+      api: { condition: service_healthy }
+    restart: unless-stopped
+    init: true
+    healthcheck:
+      test: ["CMD-SHELL", "wget --header='Host: ${APP_DOMAIN:-thechoice.mlaghuibrahim.fr}' -qO- http://localhost:4000/ || exit 1"]
+      interval: 15s
+      timeout: 8s
+      retries: 10
+      start_period: 25s
+    logging: *logging
+    networks: [thechoice-prod]
+
+  gateway:
+    image: nginx:1.29-alpine
+    container_name: thechoice-gateway-prod
+    ports: ["${APP_BIND_HOST:-127.0.0.1}:${APP_PORT:-8084}:80"]
+    volumes:
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      web: { condition: service_healthy }
+      api: { condition: service_healthy }
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1/healthz || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+    logging: *logging
+    networks: [thechoice-prod]
+
+volumes:
+  postgres_prod:
+  uploads_prod:
+
+networks:
+  thechoice-prod:
+    driver: bridge

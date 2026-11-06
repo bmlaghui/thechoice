@@ -1,0 +1,1546 @@
+<div class="admin-shell">
+  <aside>
+    <a class="brand" href="/" aria-label="Retour au site The Choice"
+      ><img
+        ngSrc="/images/logo/logo-official.png"
+        width="148"
+        height="63"
+        priority
+        alt="The Choice Fusion Food"
+      /><small>Maison · Administration</small></a
+    >
+    <nav aria-label="Navigation de l’administration">
+      @for (group of navGroups; track group.label) {
+        <details class="nav-group" [open]="group.items.includes(active()) || (group.label === 'Configuration' && isConfigurationModule())">
+          <summary><span>{{ group.icon }}</span><b>{{ group.label }}</b><i>⌄</i></summary>
+          <div>
+            @for (label of group.items; track label) {
+              <button type="button" [class.active]="active() === label || (label === 'Configuration' && isConfigurationModule())" (click)="select(label)">
+                <span>{{ navIcons[label] }}</span><b>{{ label }}</b>
+              </button>
+            }
+          </div>
+        </details>
+      }
+    </nav>
+    <div class="profile">
+      <button
+        class="profile-avatar"
+        type="button"
+        (click)="goProfile()"
+        aria-label="Gérer mon profil"
+      >
+        {{ api.user()?.email?.charAt(0)?.toUpperCase() }}
+      </button>
+      <p>
+        <strong>{{ api.user()?.email }}</strong
+        ><small
+          >{{ api.user()?.role }} ·
+          <button type="button" (click)="goProfile()">Mon profil</button></small
+        >
+      </p>
+      <button type="button" (click)="logout()" aria-label="Se déconnecter">↗</button>
+    </div>
+  </aside>
+
+  <main>
+    <header class="topbar">
+      <div>
+        <p class="breadcrumb">
+          THE CHOICE / CMS / <span>{{ active() }}</span>
+        </p>
+        <h1>{{ active() }}</h1>
+      </div>
+      <div class="live"><i></i> Site en ligne</div>
+    </header>
+    @if (error()) {
+      <div class="alert" role="alert">
+        {{ error() }} <button type="button" (click)="error.set('')">×</button>
+      </div>
+    }
+
+    @if (active() === 'Tableau de bord') {
+      <section class="welcome">
+        <div>
+          <p class="eyebrow">Cockpit de la maison</p>
+          <h2>Bonsoir, <em>la maison.</em></h2>
+          <p>Activité des 14 derniers jours et priorités du prochain service.</p>
+        </div>
+        <div class="date">
+          <span>{{ number('todayCovers') }}</span
+          ><small>couverts<br />aujourd’hui</small>
+        </div>
+      </section>
+      <section class="stats">
+        <article>
+          <span class="stat-icon">◷</span>
+          <div>
+            <strong>{{ number('todayReservations') }}</strong>
+            <p>Tables aujourd’hui</p>
+          </div>
+          <small>{{ number('todayCovers') }} couverts attendus</small>
+        </article>
+        <article class="attention">
+          <span class="stat-icon">!</span>
+          <div>
+            <strong>{{ number('pendingReservations') }}</strong>
+            <p>Demandes à confirmer</p>
+          </div>
+          <small>Action prioritaire</small>
+        </article>
+        <article>
+          <span class="stat-icon">↗</span>
+          <div>
+            <strong>{{ number('monthReservations') }}</strong>
+            <p>Demandes ce mois</p>
+          </div>
+          <small>{{ number('confirmationRate') }} % confirmées</small>
+        </article>
+        <article class="attention">
+          <span class="stat-icon">◌</span>
+          <div>
+            <strong>{{ number('unreadMessages') }}</strong>
+            <p>Messages non lus</p>
+          </div>
+          <small>{{ number('eventInquiries') }} demandes événement · {{ number('eventConversionRate') }} % gagnées</small>
+        </article>
+      </section>
+      <section class="quick-actions" aria-label="Actions rapides">
+        <p>Actions rapides</p>
+        <button type="button" (click)="select('Planning')"><span>◷</span>Gérer le planning</button
+        ><button type="button" (click)="select('Plats')">
+          <span>◇</span>Mettre à jour la carte</button
+        ><button type="button" (click)="select('Catégories')">
+          <span>⌘</span>Organiser la carte</button
+        ><button type="button" (click)="select('Messages')"><span>◌</span>Voir les messages</button>
+      </section>
+      <section class="analytics-grid">
+        <article class="card activity-chart">
+          <div class="card-head">
+            <div>
+              <p class="eyebrow">Tendance</p>
+              <h3>Demandes entrantes · 14 jours</h3>
+            </div>
+            <span class="mail-health" [class.online]="mailReady()"
+              ><i></i>{{ mailReady() ? 'E-mails opérationnels' : 'SMTP à vérifier' }}</span
+            >
+          </div>
+          <div
+            class="bar-chart"
+            role="img"
+            aria-label="Évolution des réservations et messages reçus"
+          >
+            @for (item of dailyActivity(); track item['date']) {
+              <div class="bar-day">
+                <div class="bar-value">
+                  {{ Number(item['reservations']) + Number(item['messages']) }}
+                </div>
+                <div class="bar-track"><i [style.height.%]="chartHeight(item)"></i></div>
+                <small>{{ item['label'] }}</small>
+              </div>
+            }
+          </div>
+          <div class="chart-legend">
+            <span><i></i> Réservations et messages reçus</span>
+          </div>
+        </article>
+        <article class="card status-chart">
+          <div class="card-head">
+            <div>
+              <p class="eyebrow">Qualité du planning</p>
+              <h3>Statuts des réservations</h3>
+            </div>
+          </div>
+          <div class="status-bars">
+            @for (item of reservationStatus(); track item['status']) {
+              <div>
+                <header>
+                  <span>{{ value(item, 'status') }}</span
+                  ><strong>{{ item['count'] }}</strong>
+                </header>
+                <p><i [class]="badge(item['status'])" [style.width.%]="statusWidth(item)"></i></p>
+              </div>
+            }
+          </div>
+        </article>
+        <article class="card time-chart">
+          <div class="card-head">
+            <div>
+              <p class="eyebrow">Affluence</p>
+              <h3>Horaires les plus demandés</h3>
+            </div>
+          </div>
+          <ol>
+            @for (item of popularTimes(); track item['time']; let index = $index) {
+              <li>
+                <span>0{{ index + 1 }}</span
+                ><strong>{{ item['time'] }}</strong>
+                <p>
+                  <i
+                    [style.width.%]="
+                      (Number(item['count']) / Math.max(1, Number(popularTimes()[0]?.['count']))) *
+                      100
+                    "
+                  ></i>
+                </p>
+                <b>{{ item['count'] }}</b>
+              </li>
+            } @empty {
+              <li class="empty-row">Pas encore assez de données.</li>
+            }
+          </ol>
+        </article>
+      </section>
+      <section class="dashboard-grid">
+        <article class="card reservations">
+          <div class="card-head">
+            <div>
+              <p class="eyebrow">Prochain service</p>
+              <h3>Réservations à venir</h3>
+            </div>
+            <button type="button" (click)="select('Planning')">Tout voir →</button>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Client</th>
+                  <th>Date</th>
+                  <th>Heure</th>
+                  <th>Couverts</th>
+                  <th>Statut</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (row of rows(); track row['id']) {
+                  <tr>
+                    <td>
+                      <b>{{ value(row, 'name') }}</b
+                      ><small>{{ value(row, 'email') }}</small>
+                    </td>
+                    <td>{{ value(row, 'date') | date: 'dd MMM' }}</td>
+                    <td>{{ value(row, 'time') }}</td>
+                    <td>
+                      <span class="guests">{{ value(row, 'guests') }}</span>
+                    </td>
+                    <td>
+                      <span class="pill" [class]="badge(value(row, 'status'))">{{
+                        value(row, 'status')
+                      }}</span>
+                    </td>
+                  </tr>
+                } @empty {
+                  <tr>
+                    <td colspan="5" class="empty-row">Aucune réservation à venir.</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </article>
+        <article class="card activity">
+          <div class="card-head">
+            <div>
+              <p class="eyebrow">Journal</p>
+              <h3>Activité récente</h3>
+            </div>
+          </div>
+          <div class="timeline">
+            @for (item of activity(); track item['id']) {
+              <div>
+                <i></i>
+                <p>
+                  <strong>{{ value(item, 'action') }} · {{ value(item, 'entity') }}</strong
+                  ><small>{{ value(item, 'createdAt') | date: 'dd/MM · HH:mm' }}</small>
+                </p>
+              </div>
+            } @empty {
+              <p class="empty-row">L’activité apparaîtra ici.</p>
+            }
+          </div>
+        </article>
+      </section>
+    } @else {
+      <section class="module-intro">
+        <div>
+          <p class="eyebrow">Gestion du contenu</p>
+          <h2>{{ config().description }}</h2>
+        </div>
+        @if (active() !== 'Configuration') { <div class="module-actions">
+          <label
+            ><span>⌕</span
+            ><input
+              [formControl]="search"
+              (keyup.enter)="load()"
+              placeholder="Rechercher…"
+              aria-label="Rechercher"
+          /></label>
+          @if (active() === 'Planning') {
+            <button class="secondary export" type="button" (click)="exportCsv()">↓ Exporter</button
+            ><button class="primary" type="button" (click)="openPlanning()">+ Ajouter</button>
+          } @else if (config().add !== false) {
+            <button class="primary" type="button" (click)="open()">
+              + Nouveau {{ config().singular }}
+            </button>
+          }
+        </div> }
+      </section>
+      @if (active() === 'Configuration') {
+        <section class="settings-hub">
+          <header><div><strong>État du site</strong><small>Les éléments à compléter sont signalés automatiquement.</small></div><button type="button" (click)="loadConfigurationOverview()">Vérifier ↻</button></header>
+          <div>@for (module of configurationModules; track module.label) {
+            <button type="button" (click)="select(module.label)" [class.needs-attention]="!configurationState(module.label).ready">
+              <span>{{module.icon}}</span><strong>{{module.label}}</strong><small>{{module.description}}</small>
+              <em [class.ready]="configurationState(module.label).ready">{{ configurationState(module.label).ready ? 'Configuré' : 'À compléter' }}</em>
+              <b>{{ configurationState(module.label).detail }}</b><i>→</i>
+            </button>
+          }</div>
+        </section>
+      }
+      @if (active() === 'Planning') {
+        <section class="planning-kpis">
+          <button type="button" (click)="today()">
+            <span>{{ planningStats().today }}</span>
+            <p>Entrées aujourd’hui</p></button
+          ><button type="button" (click)="today()">
+            <span>{{ planningStats().covers }}</span>
+            <p>Couverts aujourd’hui</p></button
+          ><button type="button" (click)="setStatusFilter('PENDING')">
+            <span>{{ planningStats().pending }}</span>
+            <p>Demandes à traiter</p></button
+          ><button type="button" (click)="setKindFilter('Événement')">
+            <span>{{ planningStats().events }}</span>
+            <p>Événements</p>
+          </button>
+        </section>
+        <section class="planning-toolbar card">
+          <div class="period-nav">
+            <button type="button" (click)="movePeriod(-1)" aria-label="Période précédente">←</button
+            ><button class="today-button" type="button" (click)="today()">Aujourd’hui</button
+            ><button type="button" (click)="movePeriod(1)" aria-label="Période suivante">→</button
+            ><strong>{{ planningView() === 'day' ? dayTitle() : calendarTitle() }}</strong>
+          </div>
+          <div class="filters">
+            <select #kind (change)="setKindFilter(kind.value)" aria-label="Filtrer par type">
+              <option>Tous</option>
+              <option>Réservation</option>
+              <option>Événement</option></select
+            ><select
+              #status
+              (change)="setStatusFilter(status.value)"
+              aria-label="Filtrer par statut"
+            >
+              <option>Tous</option>
+              <option value="PENDING">En attente</option>
+              <option value="CONFIRMED">Confirmé</option>
+              <option value="DEMANDE">Demande événement</option>
+              <option value="CANCELLED">Annulé</option>
+            </select>
+            <div class="view-switch">
+              <button
+                type="button"
+                [class.active]="planningView() === 'month'"
+                (click)="planningView.set('month')"
+              >
+                Mois</button
+              ><button
+                type="button"
+                [class.active]="planningView() === 'week'"
+                (click)="planningView.set('week')"
+              >
+                Semaine</button
+              ><button
+                type="button"
+                [class.active]="planningView() === 'day'"
+                (click)="planningView.set('day')"
+              >
+                Jour</button
+              ><button
+                type="button"
+                [class.active]="planningView() === 'list'"
+                (click)="planningView.set('list')"
+              >
+                Liste
+              </button>
+            </div>
+          </div>
+        </section>
+        @if (planningView() === 'day') {
+          <section class="day-agenda card">
+            <header>
+              <div>
+                <span>{{ dayTitle() }}</span
+                ><strong
+                  >{{ daySummary().entries }} entrée{{ daySummary().entries > 1 ? 's' : '' }} ·
+                  {{ daySummary().covers }} couverts</strong
+                >
+              </div>
+            </header>
+            <div class="time-grid">
+              @for (slot of daySlots(); track slot.hour) {
+                <div
+                  class="time-slot"
+                  [class.drag-over]="dragTarget() === dateKey(calendarCursor()) + '-' + slot.hour"
+                  (dragover)="dragOver($event, dateKey(calendarCursor()) + '-' + slot.hour)"
+                  (drop)="dropOn($event, dateKey(calendarCursor()), slot.hour)"
+                >
+                  <time>{{ slot.label }}</time>
+                  <div class="slot-content">
+                    @for (item of slot.items; track item['id']) {
+                      <button
+                        type="button"
+                        draggable="true"
+                        (dragstart)="dragStart($event, item)"
+                        (dragend)="dragEnd()"
+                        [class.event]="item['kind'] === 'Événement'"
+                        (click)="open(item)"
+                      >
+                        <span>{{ item['time'] || 'Événement' }}</span
+                        ><strong>{{ item['name'] }}</strong
+                        ><small>{{ item['guests'] }} personnes · {{ item['status'] }}</small>
+                      </button>
+                    } @empty {
+                      <button
+                        type="button"
+                        class="free-slot"
+                        (click)="openPlanning(calendarCursor(), slot.hour)"
+                      >
+                        <span>+</span> Ajouter sur ce créneau
+                      </button>
+                    }
+                  </div>
+                </div>
+              }
+            </div>
+          </section>
+        } @else if (planningView() !== 'list') {
+          <section class="calendar card" [class.week-view]="planningView() === 'week'">
+            <div class="weekdays">
+              @for (day of ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim']; track day) {
+                <span>{{ day }}</span>
+              }
+            </div>
+            <div class="month-grid">
+              @for (cell of calendarDays(); track $index) {
+                <div
+                  [class.outside]="!cell"
+                  [class.drag-over]="cell && dragTarget() === cell.key"
+                  (dragover)="dragOver($event, cell?.key ?? '')"
+                  (drop)="dropOn($event, cell?.key ?? '')"
+                >
+                  <b>{{ cell?.day }}</b>
+                  @for (item of cell?.items ?? []; track item['id']) {
+                    <button
+                      type="button"
+                      draggable="true"
+                      (dragstart)="dragStart($event, item)"
+                      (dragend)="dragEnd()"
+                      [class.event]="item['kind'] === 'Événement'"
+                      (click)="open(item)"
+                    >
+                      <span>{{ item['kind'] === 'Événement' ? 'Év.' : item['time'] }}</span
+                      >{{ item['name'] }} <small>· {{ item['guests'] }} pers.</small>
+                    </button>
+                  }
+                </div>
+              }
+            </div>
+          </section>
+        }
+      }
+      @if (active() === 'Horaires') {
+        <section class="hours-manager">
+          <header class="hours-summary card">
+            <div>
+              <span>SEMAINE TYPE</span><strong>{{ rows().length }} jours configurés</strong
+              ><small>Ces horaires sont publiés sur le site public.</small>
+            </div>
+            <button type="button" (click)="load()">Actualiser ↻</button>
+          </header>
+          <div class="hours-list card">
+            @for (row of rows(); track row['day']) {
+              <article class="hour-row" [class.is-closed]="row['closed']">
+                <div class="hour-day">
+                  <span
+                    >{{ Number(row['day']) + 1 < 10 ? '0' : '' }}{{ Number(row['day']) + 1 }}</span
+                  >
+                  <div>
+                    <strong>{{ row['label'] }}</strong
+                    ><small>{{ row['closed'] ? 'Restaurant fermé' : 'Service continu' }}</small>
+                  </div>
+                </div>
+                <button
+                  class="hour-toggle"
+                  type="button"
+                  [class.active]="!row['closed']"
+                  (click)="toggleHour(row)"
+                  [attr.aria-label]="
+                    row['closed'] ? 'Ouvrir ' + row['label'] : 'Fermer ' + row['label']
+                  "
+                >
+                  <i></i>{{ row['closed'] ? 'Fermé' : 'Ouvert' }}
+                </button>
+                <div class="hour-range">
+                  @if (row['closed']) {
+                    <span class="closed-label">Aucun service</span>
+                  } @else {
+                    <time>{{ row['opensAt'] }}</time
+                    ><span><i></i></span><time>{{ row['closesAt'] }}</time>
+                  }
+                </div>
+                <div class="hour-actions">
+                  <button
+                    type="button"
+                    (click)="copyHourToWeek(row)"
+                    title="Appliquer à toute la semaine"
+                  >
+                    Dupliquer</button
+                  ><button class="edit-hour" type="button" (click)="open(row)">Modifier</button>
+                </div>
+              </article>
+            } @empty {
+              <div class="empty-row"><strong>Aucun horaire configuré</strong></div>
+            }
+          </div>
+          <aside class="hours-note">
+            <span>ℹ</span>
+            <p>
+              <strong>Bon à savoir</strong> Les modifications sont immédiatement visibles sur le
+              site. Les créneaux de réservation doivent rester compris dans ces plages.
+            </p>
+          </aside>
+        </section>
+      }
+      @if (active() === 'Rôles & accès') {
+        <section class="rbac">
+          <header>
+            <div>
+              <span>MATRICE RBAC</span>
+              <h3>Permissions par rôle</h3>
+              <p>Chaque changement est enregistré immédiatement.</p>
+            </div>
+            <i>🔒</i>
+          </header>
+          <div class="rbac-table">
+            <div class="rbac-head">
+              <strong>Action autorisée</strong>
+              @for (role of rows(); track role['role']) {
+                <div>
+                  <b>{{ role['label'] }}</b
+                  ><small>{{ roleLabel('' + role['role']) }}</small>
+                </div>
+              }
+            </div>
+            @for (permission of permissions; track permission.key) {
+              <div class="rbac-row">
+                <strong>{{ permission.label }}</strong>
+                @for (role of rows(); track role['role']) {
+                  <label [class.locked]="role['role'] === 'SUPER_ADMIN'"
+                    ><input
+                      type="checkbox"
+                      [checked]="
+                        role['role'] === 'SUPER_ADMIN' || hasPermission(role, permission.key)
+                      "
+                      [disabled]="role['role'] === 'SUPER_ADMIN'"
+                      (change)="togglePermission(role, permission.key, $any($event.target).checked)"
+                    /><i></i
+                    ><span>{{
+                      role['role'] === 'SUPER_ADMIN'
+                        ? 'Toujours autorisé'
+                        : hasPermission(role, permission.key)
+                          ? 'Autorisé'
+                          : 'Interdit'
+                    }}</span></label
+                  >
+                }
+              </div>
+            }
+          </div>
+        </section>
+      }
+      <section
+        class="card data-card"
+        [class.module-hidden]="active() === 'Configuration'"
+        [class.messages-card]="active() === 'Messages'"
+        [class.hours-card]="active() === 'Horaires'"
+        [class.roles-card]="active() === 'Rôles & accès'"
+      >
+        <div class="data-meta">
+          <p>
+            <strong>{{ total() }}</strong> résultat{{ total() > 1 ? 's' : '' }}
+          </p>
+          <button type="button" (click)="load()">Actualiser ↻</button>
+          @if (active() === 'Planning') { <button type="button" (click)="exportData('reservations')">Exporter les réservations CSV</button><button type="button" (click)="exportData('events')">Exporter les événements CSV</button> }
+          @if (active() === 'Messages') { <button type="button" (click)="exportData('messages')">Exporter en CSV</button> }
+        </div>
+        @if (loading()) {
+          <div class="loading"><i></i><span>Chargement des données…</span></div>
+        } @else {
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  @for (column of config().columns; track column.key) {
+                    <th>
+                      <button type="button" (click)="sort(column.key)">
+                        {{ column.label }}
+                        @if (sortKey() === column.key) {
+                          <span>{{ sortDirection() === 'asc' ? '↑' : '↓' }}</span>
+                        }
+                      </button>
+                    </th>
+                  }
+                  <th class="actions-cell">Actions</th>
+                </tr>
+                <tr class="column-filters">
+                  @for (column of config().columns; track column.key) {
+                    <th>
+                      <label
+                        ><span>⌕</span
+                        ><input
+                          #filterInput
+                          type="search"
+                          [placeholder]="'Filtrer ' + column.label.toLowerCase()"
+                          (input)="filterColumn(column.key, filterInput.value)"
+                      /></label>
+                    </th>
+                  }
+                  <th>
+                    <button type="button" class="clear-filters" (click)="columnFilters.set({})">
+                      Effacer
+                    </button>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (row of displayRows(); track row['id'] ?? row['key'] ?? row['day']) {
+                  <tr
+                    [class.category-row]="
+                      ['Catégories', 'Plats', 'Galerie', 'Témoignages'].includes(active())
+                    "
+                    [attr.draggable]="
+                      ['Catégories', 'Plats', 'Galerie', 'Témoignages'].includes(active())
+                    "
+                    (dragstart)="
+                      active() === 'Catégories'
+                        ? categoryDragStart($event, row)
+                        : active() === 'Plats'
+                          ? dishDragStart($event, row)
+                          : active() === 'Galerie'
+                            ? galleryDragStart($event, row)
+                            : testimonialDragStart($event, row)
+                    "
+                    (dragover)="
+                      ['Catégories', 'Plats', 'Galerie', 'Témoignages'].includes(active()) &&
+                        $event.preventDefault()
+                    "
+                    (drop)="
+                      active() === 'Catégories'
+                        ? categoryDrop($event, row)
+                        : active() === 'Plats'
+                          ? dishDrop($event, row)
+                          : active() === 'Galerie'
+                            ? galleryDrop($event, row)
+                            : testimonialDrop($event, row)
+                    "
+                  >
+                    @for (column of config().columns; track column.key) {
+                      <td>
+                        @if (
+                          (['Catégories', 'Plats', 'Témoignages'].includes(active()) &&
+                            ['name', 'author'].includes(column.key)) ||
+                          (active() === 'Galerie' && column.key === 'imageUrl')
+                        ) {
+                          <span class="drag-handle" title="Glisser pour réordonner">⋮⋮</span>
+                        }
+                        @if ((active() === 'Galerie' && column.key === 'imageUrl') || (active() === 'Médiathèque' && column.key === 'url')) {
+                          <img
+                            class="gallery-thumb"
+                            [src]="value(row, active() === 'Médiathèque' ? 'url' : 'imageUrl')"
+                            [alt]="value(row, 'alt')"
+                          />
+                        } @else {
+                          <span
+                            [class.pill]="
+                              column.key === 'status' ||
+                              column.key === 'published' ||
+                              column.key === 'active' ||
+                              column.key === 'available' ||
+                              column.key === 'read' ||
+                              column.key === 'closed' ||
+                              column.key === 'kind'
+                            "
+                            [class]="badge(value(row, column.key))"
+                            >{{ value(row, column.key) }}</span
+                          >
+                        }
+                      </td>
+                    }
+                    <td class="row-actions">
+                      @if (['Pages', 'Catégories', 'Plats', 'Galerie', 'Témoignages', 'Offres événement', 'Réseaux sociaux'].includes(active())) {
+                        <button
+                          class="icon-action visibility-action"
+                          type="button"
+                          (click)="quickToggle(row)"
+                          [attr.aria-label]="isPubliclyVisible(row) ? 'Masquer' : 'Publier'"
+                          [attr.data-tooltip]="isPubliclyVisible(row) ? 'Masquer du site' : 'Publier sur le site'"
+                        >{{ isPubliclyVisible(row) ? '◉' : '○' }}</button>
+                      }
+                      @if (active() === 'Messages') {
+                        <button
+                          class="icon-action message-view"
+                          type="button"
+                          (click)="openMessage(row)"
+                          aria-label="Consulter le message"
+                          data-tooltip="Consulter"
+                        >
+                          ◉</button
+                        ><button
+                          class="icon-action"
+                          type="button"
+                          (click)="replyMessage(row)"
+                          aria-label="Répondre au message"
+                          data-tooltip="Répondre"
+                        >
+                          ↩</button
+                        ><button
+                          class="icon-action"
+                          type="button"
+                          (click)="toggleMessageRead(row)"
+                          [attr.aria-label]="row['read'] ? 'Marquer non lu' : 'Marquer lu'"
+                          [attr.data-tooltip]="row['read'] ? 'Marquer non lu' : 'Marquer lu'"
+                        >
+                          {{ row['read'] ? '○' : '●' }}</button
+                        ><button
+                          class="icon-action delete"
+                          type="button"
+                          (click)="deleteMessage(row)"
+                          aria-label="Supprimer le message"
+                          data-tooltip="Supprimer"
+                        >
+                          ⌫
+                        </button>
+                      }
+                      @if (active() === 'Catégories') {
+                        <button
+                          class="icon-action preview-action"
+                          type="button"
+                          (click)="previewCategory(row)"
+                          aria-label="Prévisualiser la catégorie"
+                          data-tooltip="Voir sur le site"
+                        >
+                          ◉
+                        </button>
+                      }
+                      @if (active() === 'Plats') {
+                        <button
+                          class="icon-action preview-action"
+                          type="button"
+                          (click)="dishPreview.set(row)"
+                          aria-label="Prévisualiser le plat"
+                          data-tooltip="Aperçu du plat"
+                        >
+                          ◉
+                        </button>
+                      }
+                      @if (active() === 'Galerie') {
+                        <button
+                          class="icon-action preview-action"
+                          type="button"
+                          (click)="galleryPreview.set(row)"
+                          aria-label="Prévisualiser l’image"
+                          data-tooltip="Aperçu plein écran"
+                        >
+                          ◉
+                        </button>
+                      }
+                      @if (active() === 'Utilisateurs') {
+                        <button
+                          class="icon-action"
+                          type="button"
+                          (click)="open(row)"
+                          aria-label="Modifier l’utilisateur"
+                          data-tooltip="Modifier"
+                        >
+                          ✎</button
+                        ><button
+                          class="icon-action password-action"
+                          type="button"
+                          (click)="openUserPassword(row)"
+                          aria-label="Modifier le mot de passe"
+                          data-tooltip="Mot de passe"
+                        >
+                          ⚿</button
+                        ><button
+                          class="icon-action"
+                          [class.delete]="!row['manuallyBlocked']"
+                          type="button"
+                          (click)="toggleUserBlock(row)"
+                          [attr.aria-label]="
+                            row['manuallyBlocked'] ? 'Débloquer le compte' : 'Bloquer le compte'
+                          "
+                          [attr.data-tooltip]="row['manuallyBlocked'] ? 'Débloquer' : 'Bloquer'"
+                        >
+                          {{ row['manuallyBlocked'] ? '○' : '⊘' }}</button
+                        ><button
+                          class="icon-action"
+                          type="button"
+                          (click)="revokeUserSessions(row)"
+                          aria-label="Déconnecter tous les appareils"
+                          data-tooltip="Révoquer les sessions"
+                        >
+                          ↗</button
+                        ><button
+                          class="icon-action delete"
+                          type="button"
+                          (click)="deleteUser(row)"
+                          aria-label="Supprimer l’utilisateur"
+                          data-tooltip="Supprimer"
+                        >
+                          ⌫
+                        </button>
+                      }
+                      @if (
+                        active() === 'Planning' && isReservation(row) && row['status'] === 'PENDING'
+                      ) {
+                        <button
+                          class="icon-action confirm"
+                          type="button"
+                          (click)="updateStatus(row, 'CONFIRMED')"
+                          aria-label="Confirmer la réservation"
+                          data-tooltip="Confirmer"
+                        >
+                          ✓
+                        </button>
+                      }
+                      @if (active() === 'Planning') {
+                        <button
+                          class="icon-action"
+                          type="button"
+                          (click)="open(row)"
+                          aria-label="Voir les détails"
+                          data-tooltip="Détails et modification"
+                        >
+                          ✎
+                        </button>
+                      }
+                      @if (
+                        ![
+                          'Planning',
+                          'Messages',
+                          'Horaires',
+                          'Utilisateurs',
+                          'Rôles & accès',
+                        ].includes(active())
+                      ) {
+                        <button
+                          class="icon-action"
+                          type="button"
+                          (click)="open(row)"
+                          [attr.aria-label]="'Modifier ' + config().singular"
+                          data-tooltip="Modifier"
+                        >
+                          ✎</button
+                        >
+                        @if (!['Coordonnées', 'Identité publique', 'Chiffres du restaurant', 'Réglages réservation', 'Réseaux sociaux', 'Paramètres'].includes(active())) {
+                          <button
+                            class="icon-action delete"
+                            type="button"
+                            (click)="remove(row)"
+                            [attr.aria-label]="'Supprimer ' + config().singular"
+                            data-tooltip="Supprimer"
+                          >
+                            ⌫
+                          </button>
+                        }
+                      }
+                    </td>
+                  </tr>
+                } @empty {
+                  <tr>
+                    <td [attr.colspan]="config().columns.length + 1" class="empty-row">
+                      <span>◇</span><strong>Aucune donnée</strong
+                      ><small>Créez votre premier contenu ou modifiez votre recherche.</small>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+          <div class="pagination-wrap">
+            <label
+              >Afficher
+              <select #pageSize (change)="setLimit(pageSize.value)">
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+              </select></label
+            >
+            @if (totalPages() > 1) {
+              <nav class="pagination" aria-label="Pagination">
+                <button type="button" (click)="changePage(page() - 1)" [disabled]="page() === 1">
+                  ← Précédent</button
+                ><span
+                  >Page <strong>{{ page() }}</strong> sur {{ totalPages() }}</span
+                ><button
+                  type="button"
+                  (click)="changePage(page() + 1)"
+                  [disabled]="page() === totalPages()"
+                >
+                  Suivant →
+                </button>
+              </nav>
+            }
+          </div>
+        }
+      </section>
+    }
+  </main>
+</div>
+
+@if (messagePreview(); as message) {
+  <div class="message-overlay" (click)="messagePreview.set(null)">
+    <article class="message-panel" (click)="$event.stopPropagation()">
+      <header>
+        <div>
+          <small>{{ message['read'] ? 'MESSAGE LU' : 'NOUVEAU MESSAGE' }}</small>
+          <h2>Message de {{ message['name'] }}</h2>
+        </div>
+        <button type="button" (click)="messagePreview.set(null)" aria-label="Fermer">×</button>
+      </header>
+      <section class="message-contact">
+        <a [href]="'mailto:' + message['email']"
+          ><span>E-mail</span><strong>{{ message['email'] }}</strong></a
+        ><a [href]="'tel:' + message['phone']"
+          ><span>Téléphone</span><strong>{{ message['phone'] || 'Non renseigné' }}</strong></a
+        >
+        <div>
+          <span>Reçu le</span
+          ><strong>{{ value(message, 'createdAt') | date: 'dd/MM/yyyy à HH:mm' }}</strong>
+        </div>
+      </section>
+      <section class="message-body">
+        <span>Message</span>
+        <p>{{ message['message'] }}</p>
+      </section>
+      @if (messageReplyOpen()) {
+        <section class="reply-editor">
+          <label><span>Objet</span><input type="text" [formControl]="messageReplySubject" /></label>
+          <div class="wysiwyg-toolbar" aria-label="Mise en forme">
+            <button type="button" (click)="formatReply('bold')" title="Gras"><b>B</b></button
+            ><button type="button" (click)="formatReply('italic')" title="Italique"><i>I</i></button
+            ><button type="button" (click)="formatReply('underline')" title="Souligné">
+              <u>U</u></button
+            ><button type="button" (click)="formatReply('insertUnorderedList')" title="Liste">
+              • Liste
+            </button>
+          </div>
+          <div
+            class="wysiwyg-content"
+            contenteditable="true"
+            role="textbox"
+            aria-multiline="true"
+            [innerHTML]="messageReplyHtml()"
+            (input)="updateReply($event)"
+          ></div>
+        </section>
+      }
+      <footer>
+        <button class="danger-button" type="button" (click)="deleteMessage(message)">
+          <span>⌫</span> Supprimer</button
+        ><button class="secondary" type="button" (click)="toggleMessageRead(message)">
+          {{ message['read'] ? 'Marquer non lu' : 'Marquer lu' }}
+        </button>
+        @if (messageReplyOpen()) {
+          <button class="secondary" type="button" (click)="messageReplyOpen.set(false)">
+            Annuler</button
+          ><button
+            class="primary"
+            type="button"
+            [disabled]="messageReplySending()"
+            (click)="sendMessageReply()"
+          >
+            {{ messageReplySending() ? 'Envoi…' : 'Envoyer la réponse →' }}
+          </button>
+        } @else {
+          <button class="primary" type="button" (click)="replyMessage(message)">
+            Répondre ici
+          </button>
+        }
+      </footer>
+    </article>
+  </div>
+}
+
+@if (editorOpen()) {
+  <div class="modal-backdrop" [class.cms-workspace-backdrop]="active() === 'Pages'" (click)="close()">
+    <section
+      class="editor"
+      [class.cms-page-workspace]="active() === 'Pages'"
+      [attr.role]="active() === 'Pages' ? 'main' : 'dialog'"
+      [attr.aria-modal]="active() === 'Pages' ? null : true"
+      [attr.aria-label]="'Modifier ' + config().singular"
+      (click)="$event.stopPropagation()"
+    >
+      <header>
+        <div>
+          @if (active() === 'Pages') {
+            <button class="cms-back" type="button" (click)="close()">← Toutes les pages</button>
+          } @else { <p class="eyebrow">Éditeur</p> }
+          <h2>
+            {{
+              planningCreate()
+                ? 'Ajouter au planning'
+                : (editing() ? 'Modifier' : 'Nouveau') + ' ' + config().singular
+            }}
+          </h2>
+        </div>
+        @if (active() !== 'Pages') { <button type="button" (click)="close()" aria-label="Fermer">×</button> }
+      </header>
+      <form [formGroup]="form" (ngSubmit)="save()">
+        <div class="fields" [class.dish-fields]="active() === 'Plats'">
+          @if (planningCreate()) {
+            <label
+              ><span>Type</span
+              ><select formControlName="kind">
+                <option value="Réservation">Réservation</option>
+                <option value="Événement">Événement</option>
+              </select></label
+            >
+            <label><span>Nom du contact</span><input type="text" formControlName="name" /></label>
+            <label><span>E-mail</span><input type="email" formControlName="email" /></label>
+            <label><span>Téléphone</span><input type="text" formControlName="phone" /></label>
+            <label
+              ><span>Date</span
+              ><input type="date" formControlName="date" (change)="reservationDateChanged($event)"
+            /></label>
+            @if (form.controls['kind'].value === 'Réservation') {
+              <label
+                ><span>Heure</span
+                ><select formControlName="time">
+                  <option value="">Aucun créneau</option>
+                  @for (slot of reservationSlots(); track slot) {
+                    <option [value]="slot">{{ slot }}</option>
+                  }
+                </select></label
+              >
+            } @else {
+              <label
+                ><span>Type d’événement</span><input type="text" formControlName="eventType"
+              /></label>
+            }
+            <label
+              ><span>Nombre de personnes</span
+              ><input type="number" min="1" formControlName="guests"
+            /></label>
+            <label class="full"
+              ><span>Message / notes</span><textarea rows="4" formControlName="message"></textarea>
+            </label>
+            @if (form.controls['kind'].value === 'Réservation' && reservationSchedule(); as hours) {
+              <p class="full schedule-hint" [class.closed]="hours['closed']">
+                {{
+                  hours['closed']
+                    ? 'Restaurant fermé ce jour'
+                    : 'Horaires configurés : ' + hours['opensAt'] + ' – ' + hours['closesAt']
+                }}
+              </p>
+            }
+          } @else {
+            @if (active() === 'Pages') {
+              <div class="cms-editor full">
+                <section class="cms-fields">
+                  <div class="cms-page-meta">
+                    <label><span>Titre de la page</span><input formControlName="title" /></label>
+                    <label><span>Adresse</span><input formControlName="slug" /></label>
+                    <label><span>Publication</span><select formControlName="status"><option value="DRAFT">Brouillon</option><option value="PUBLISHED">Publiée</option></select></label>
+                  </div>
+                  @for (block of cmsBlocks(); track $index; let blockIndex = $index) {
+                    <article class="cms-block">
+                      <header><span>Bloc {{ blockIndex + 1 }}</span><strong>{{ block.type }}</strong></header>
+                      @for (key of cmsKeys(block.content); track key) {
+                        <label><span>{{ key }}</span><textarea rows="3" [value]="cmsValue(blockIndex,key)" (input)="updateCmsValue(blockIndex,key,$any($event.target).value)"></textarea></label>
+                      }
+                      @for (imageKey of cmsImageKeys(block.content); track imageKey) {
+                        <label><span>Photo {{ $index + 1 }}</span><span class="file-upload"><input type="file" accept="image/jpeg,image/png,image/webp,image/avif" (change)="uploadCmsImage(blockIndex,$event,imageKey)" /><b>{{ block.content[imageKey] ? 'Remplacer la photo' : 'Ajouter une photo' }}</b><small>JPG, PNG, WebP ou AVIF · 8 Mo maximum</small></span></label>
+                        @if (block.content[imageKey]) { <div class="cms-image-preview" [style.background-image]="'url(\'' + block.content[imageKey] + '\')'"></div><label><span>Description de la photo</span><input [value]="cmsValue(blockIndex,cmsImageAltKey(imageKey))" (input)="updateCmsValue(blockIndex,cmsImageAltKey(imageKey),$any($event.target).value)" /></label> }
+                      }
+                    </article>
+                  }
+                  <article class="cms-block cms-seo"><header><span>Référencement</span><strong>SEO</strong></header><label><span>Titre Google</span><input [value]="cmsSeo().title" (input)="updateCmsSeo('title',$any($event.target).value)" /></label><label><span>Description Google</span><textarea rows="3" [value]="cmsSeo().description" (input)="updateCmsSeo('description',$any($event.target).value)"></textarea></label></article>
+                </section>
+                <div class="cms-preview"><header><div><span>Aperçu du site</span><small>La version actuellement publiée</small></div><a [href]="publicPagePath()" target="_blank">Ouvrir ↗</a></header><iframe [src]="publicPagePreviewUrl()" title="Aperçu de la page publique"></iframe></div>
+              </div>
+            } @else {
+            @for (field of config().fields; track field.key) {
+              <label
+                [class.full]="
+                  field.type === 'textarea' ||
+                  field.type === 'json' ||
+                  field.type === 'allergens' ||
+                  field.type === 'file' ||
+                  (active() === 'Catégories' && ['imageAlt'].includes(field.key))
+                "
+                [class.toggle-field]="field.type === 'checkbox'"
+                [class.characteristic-field]="active() === 'Plats' && field.type === 'checkbox'"
+                ><span>{{ field.label }}</span>
+                @if (field.type === 'file') {
+                  <span class="file-upload"
+                    ><input
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp,image/avif"
+                      (change)="
+                        active() === 'Catégories'
+                          ? uploadCategoryImage($event)
+                          : active() === 'Plats'
+                            ? uploadDishImage($event)
+                            : active() === 'Témoignages'
+                              ? uploadTestimonialImage($event)
+                              : uploadGalleryImage($event)
+                      "
+                    /><b>{{
+                      uploadingImage()
+                        ? 'Import en cours…'
+                        : formValue(field.key)
+                          ? 'Remplacer l’image'
+                          : 'Choisir une image'
+                    }}</b
+                    ><small>JPG, PNG, WebP ou AVIF · 8 Mo maximum</small></span
+                  >
+                } @else if (field.type === 'category') {
+                  <select [formControlName]="field.key">
+                    <option value="">Choisir une catégorie</option>
+                    @for (category of categoryOptions(); track category['id']) {
+                      <option [value]="category['id']">{{ category['name'] }}</option>
+                    }
+                  </select>
+                } @else if (field.type === 'tags') {
+                  <input
+                    type="text"
+                    [formControlName]="field.key"
+                    placeholder="Truffe, parmesan, herbes fraîches"
+                  /><small class="field-help">Séparez les ingrédients par une virgule.</small>
+                } @else if (field.type === 'allergens') {
+                  <span class="allergen-picker">
+                    @for (allergen of allergenOptions(); track allergen['id']) {
+                      <label
+                        ><input
+                          type="checkbox"
+                          [checked]="allergenChecked('' + allergen['id'])"
+                          (change)="
+                            toggleAllergen('' + allergen['id'], $any($event.target).checked)
+                          "
+                        /><span>{{ allergen['name'] }}</span></label
+                      >
+                    }
+                  </span>
+                } @else if (field.type === 'textarea' || field.type === 'json') {
+                  <textarea
+                    [formControlName]="field.key"
+                    [rows]="field.type === 'json' ? 7 : 4"
+                  ></textarea>
+                } @else if (field.type === 'select') {
+                  <select [formControlName]="field.key">
+                    @for (option of field.options; track option) {
+                      <option [value]="option">{{ option }}</option>
+                    }
+                  </select>
+                } @else if (field.type === 'checkbox') {
+                  <span class="switch"
+                    ><input type="checkbox" [formControlName]="field.key" /><i></i
+                    ><b>Activé</b></span
+                  >
+                } @else {
+                  <input
+                    [type]="field.type === 'number' ? 'number' : (field.type ?? 'text')"
+                    [attr.step]="['latitude', 'longitude'].includes(field.key) ? 'any' : null"
+                    [formControlName]="field.key"
+                    [placeholder]="
+                      active() === 'Catégories'
+                        ? field.key === 'name'
+                          ? 'Ex. Pizzas'
+                          : field.key === 'eyebrow'
+                            ? 'Ex. Pâtes fraîches & artisanales'
+                            : field.key === 'imageAlt'
+                              ? 'Décrivez précisément le contenu de l’image'
+                              : ''
+                        : ''
+                    "
+                  />
+                }
+                @if (active() === 'Catégories' && field.key === 'name') {
+                  <small class="slug-preview"
+                    >URL générée : <b>/menu/{{ slugPreview() }}</b></small
+                  >
+                }
+                @if (active() === 'Catégories' && field.key === 'imageAlt') {
+                  <small class="field-help"
+                    >Utilisé pour l’accessibilité et le référencement de l’image.</small
+                  >
+                }
+              </label>
+            }
+            }
+          }
+        </div>
+        @if (active() === 'Catégories') {
+          <section
+            class="category-preview"
+            [class.has-image]="categoryImagePreview()"
+            [style.background-image]="
+              'linear-gradient(90deg,#030704ee,#06100b77),url(\'' + categoryImagePreview() + '\')'
+            "
+          >
+            <small>{{ formValue('eyebrow') || 'SURTITRE DE LA CATÉGORIE' }}</small
+            ><strong>{{ formValue('name') || 'TITRE' }}</strong>
+            <p>
+              {{ formValue('description') || 'La description de la catégorie apparaîtra ici.' }}
+            </p>
+            @if (!categoryImagePreview()) {
+              <em>Importez une image pour afficher l’aperçu</em>
+            }
+          </section>
+        }
+        @if (active() === 'Plats') {
+          <section class="dish-form-preview">
+            <div [style.background-image]="'url(\'' + dishImagePreview() + '\')'"></div>
+            <p>APERÇU DU PLAT</p>
+            <strong>{{ formValue('name') || 'Nom du plat' }}</strong
+            ><span>{{ formValue('price') || '0' }} €</span
+            ><small>{{ formValue('description') || 'Description du plat' }}</small>
+          </section>
+        }
+        @if (active() === 'Galerie' && galleryImagePreview()) {
+          <section class="gallery-form-preview">
+            <img [src]="galleryImagePreview()" [alt]="formValue('alt')" />
+            <div>
+              <small>{{ formValue('category') || 'Collection' }}</small
+              ><strong>{{ formValue('title') || 'Titre de l’image' }}</strong>
+            </div>
+          </section>
+        }
+        <div class="editor-actions">
+          @if (form.dirty || editorDirty()) { <small class="unsaved-indicator"><i></i>Modifications non enregistrées</small> }
+          <button type="button" class="secondary" (click)="close()">Annuler</button
+          ><button type="submit" class="primary">Enregistrer</button>
+        </div>
+      </form>
+    </section>
+  </div>
+}
+
+@if (selectedRow(); as selected) {
+  <div class="drawer-backdrop" (click)="close()"></div>
+  <aside class="detail-drawer" aria-label="Détail du planning">
+    <header>
+      <div>
+        <p class="eyebrow">{{ value(selected, 'kind') }}</p>
+        <h2>{{ value(selected, 'name') }}</h2>
+        <span class="pill" [class]="badge(value(selected, 'status'))">{{
+          value(selected, 'status')
+        }}</span>
+      </div>
+      <button type="button" (click)="close()" aria-label="Fermer">×</button>
+    </header>
+    <section class="contact-summary">
+      <div>
+        <small>Date</small><strong>{{ value(selected, 'displayDate') }}</strong>
+      </div>
+      <div>
+        <small>Personnes</small><strong>{{ value(selected, 'guests') }}</strong>
+      </div>
+      <div>
+        <small>Téléphone</small><strong>{{ value(selected, 'phone') }}</strong>
+      </div>
+      <div>
+        <small>E-mail</small><strong>{{ value(selected, 'email') }}</strong>
+      </div>
+    </section>
+    @if (isReservation(selected)) {
+      <form [formGroup]="form" (ngSubmit)="save()" class="reservation-edit-form">
+        <div class="drawer-form-grid">
+          <label><span>Client</span><input formControlName="name" /></label
+          ><label><span>E-mail</span><input type="email" formControlName="email" /></label
+          ><label><span>Téléphone</span><input formControlName="phone" /></label
+          ><label
+            ><span>Personnes</span
+            ><input type="number" min="1" max="30" formControlName="guests" /></label
+          ><label
+            ><span>Date</span
+            ><input
+              type="date"
+              formControlName="date"
+              (change)="reservationDateChanged($event)" /></label
+          ><label
+            ><span>Heure</span
+            ><select formControlName="time">
+              <option value="">Aucun créneau</option>
+              @for (slot of reservationSlots(); track slot) {
+                <option [value]="slot">{{ slot }}</option>
+              }
+            </select></label
+          >
+        </div>
+        @if (reservationSchedule(); as hours) {
+          <p class="schedule-hint" [class.closed]="hours['closed']">
+            {{
+              hours['closed']
+                ? 'Restaurant fermé ce jour'
+                : 'Créneaux autorisés entre ' + hours['opensAt'] + ' et ' + hours['closesAt']
+            }}
+          </p>
+        }
+        <label
+          ><span>Statut</span
+          ><select formControlName="status">
+            <option value="PENDING">En attente</option>
+            <option value="CONFIRMED">Confirmée</option>
+            <option value="CANCELLED">Annulée</option>
+            <option value="COMPLETED">Terminée</option>
+            <option value="NO_SHOW">Absent</option>
+          </select></label
+        ><label
+          ><span>Message du client</span
+          ><textarea formControlName="message" rows="3"></textarea></label
+        ><label
+          ><span>Notes internes</span
+          ><textarea
+            formControlName="internalNotes"
+            rows="5"
+            placeholder="Informations utiles pour l’équipe…"
+          ></textarea>
+        </label>
+        <div class="drawer-actions">
+          @if (selected['status'] !== 'CONFIRMED') {
+            <button
+              type="button"
+              class="confirm-action"
+              (click)="updateStatus(selected, 'CONFIRMED')"
+            >
+              ✓ Confirmer
+            </button>
+          }
+          @if (selected['status'] !== 'CANCELLED') {
+            <button
+              type="button"
+              class="cancel-action"
+              (click)="updateStatus(selected, 'CANCELLED')"
+            >
+              Annuler
+            </button>
+          }
+          <button type="submit" class="primary">Enregistrer</button>
+        </div>
+      </form>
+    } @else {
+      <form [formGroup]="form" (ngSubmit)="save()" class="event-edit-form">
+        <label><span>Contact</span><input formControlName="name" /></label
+        ><label><span>E-mail</span><input type="email" formControlName="email" /></label
+        ><label><span>Téléphone</span><input formControlName="phone" /></label
+        ><label><span>Type d’événement</span><input formControlName="eventType" /></label
+        ><label><span>Date</span><input type="date" formControlName="eventDate" /></label
+        ><label
+          ><span>Personnes</span><input type="number" min="1" formControlName="guests" /></label
+        ><label><span>Étape</span><select formControlName="status"><option value="NEW">Nouvelle demande</option><option value="CONTACTED">Contacté</option><option value="QUOTED">Devis envoyé</option><option value="WON">Gagné</option><option value="LOST">Perdu</option></select></label
+        ><label><span>Message</span><textarea formControlName="message" rows="5"></textarea></label>
+        <label><span>Notes internes</span><textarea formControlName="internalNotes" rows="4"></textarea></label>
+        <div class="drawer-actions">
+          <button type="button" class="cancel-action" (click)="deletePlanning(selected)">
+            Supprimer</button
+          ><button type="submit" class="primary">Enregistrer</button>
+        </div>
+      </form>
+    }
+    @if (isReservation(selected)) {
+      <button type="button" class="drawer-delete" (click)="deletePlanning(selected)">
+        Supprimer définitivement cette réservation
+      </button>
+    }
+  </aside>
+}
+@if (confirmation(); as confirm) {
+  <div class="confirm-overlay" (click)="confirmation.set(null)">
+    <section
+      class="confirm-modal"
+      role="alertdialog"
+      aria-modal="true"
+      [attr.aria-label]="confirm.title"
+      (click)="$event.stopPropagation()"
+    >
+      <span [class.danger]="confirm.danger">{{ confirm.danger ? '!' : '?' }}</span>
+      <h2>{{ confirm.title }}</h2>
+      <p>{{ confirm.message }}</p>
+      <footer>
+        <button type="button" class="secondary" (click)="confirmation.set(null)">Annuler</button
+        ><button
+          type="button"
+          [class.danger-button]="confirm.danger"
+          [class.primary]="!confirm.danger"
+          (click)="confirmAction()"
+        >
+          Confirmer
+        </button>
+      </footer>
+    </section>
+  </div>
+}
+@if (userPasswordTarget(); as user) {
+  <div class="confirm-overlay" (click)="closeUserPassword()">
+    <section
+      class="password-modal"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Modifier le mot de passe"
+      (click)="$event.stopPropagation()"
+    >
+      <header>
+        <div>
+          <span>SÉCURITÉ DU COMPTE</span>
+          <h2>Modifier le mot de passe</h2>
+          <p>{{ user['name'] || user['email'] }}</p>
+        </div>
+        <button type="button" (click)="closeUserPassword()" aria-label="Fermer">×</button>
+      </header>
+      <div class="password-notice">
+        <b>ℹ</b>
+        <p>La modification déconnectera immédiatement cet utilisateur de tous ses appareils.</p>
+      </div>
+      <label
+        >Nouveau mot de passe
+        <div>
+          <input
+            [type]="showUserPasswords() ? 'text' : 'password'"
+            [formControl]="userPassword"
+            autocomplete="new-password"
+          />
+        </div>
+        <small>15 caractères minimum · majuscule · minuscule · chiffre · symbole</small></label
+      ><label
+        >Confirmer le mot de passe
+        <div>
+          <input
+            [type]="showUserPasswords() ? 'text' : 'password'"
+            [formControl]="userPasswordConfirmation"
+            autocomplete="new-password"
+          /></div></label
+      ><label class="show-password"
+        ><input
+          type="checkbox"
+          [checked]="showUserPasswords()"
+          (change)="showUserPasswords.set($any($event.target).checked)"
+        />
+        Afficher les mots de passe</label
+      >
+      <footer>
+        <button type="button" class="secondary" (click)="closeUserPassword()">Annuler</button
+        ><button
+          type="button"
+          class="primary"
+          [disabled]="userPasswordSaving()"
+          (click)="saveUserPassword()"
+        >
+          {{ userPasswordSaving() ? 'Enregistrement…' : 'Mettre à jour le mot de passe' }}
+        </button>
+      </footer>
+    </section>
+  </div>
+}
+@if (toast()) {
+  <div class="toast" role="status"><span>✓</span>{{ toast() }}</div>
+}
+@if (categoryPreview(); as preview) {
+  <div class="public-preview-backdrop" (click)="categoryPreview.set(null)">
+    <section
+      class="public-preview"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Aperçu public de la catégorie"
+      (click)="$event.stopPropagation()"
+    >
+      <header>
+        <div>
+          <p>Aperçu de la page Menu</p>
+          <span>/menu/{{ value(preview, 'slug') }}</span>
+        </div>
+        <button type="button" (click)="categoryPreview.set(null)" aria-label="Fermer">×</button>
+      </header>
+      <div class="public-category-header">
+        <div
+          class="public-category-visual"
+          [style.background-image]="'url(' + value(preview, 'imageUrl') + ')'"
+        ></div>
+        <div class="public-category-copy">
+          <p>{{ value(preview, 'eyebrow') }}</p>
+          <h2>{{ value(preview, 'name') }}</h2>
+          <span>{{ value(preview, 'description') }}</span>
+        </div>
+      </div>
+      <footer>
+        <a href="/menu" target="_blank">Ouvrir la page Menu ↗</a
+        ><small>Rendu avec les données actuellement enregistrées</small>
+      </footer>
+    </section>
+  </div>
+}
+@if (dishPreview(); as dish) {
+  <div class="public-preview-backdrop" (click)="dishPreview.set(null)">
+    <section
+      class="product-detail-preview"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Aperçu public du détail du plat"
+      (click)="$event.stopPropagation()"
+    >
+      <button
+        type="button"
+        class="preview-close"
+        (click)="dishPreview.set(null)"
+        aria-label="Fermer"
+      >
+        ×
+      </button>
+      <div
+        class="product-preview-image"
+        [style.background-image]="'url(' + value(dish, 'imageUrl') + ')'"
+      >
+        <small>THE CHOICE · SIGNATURE</small>
+      </div>
+      <div class="product-preview-copy">
+        <div class="product-badges">
+          @for (badge of dishBadges(dish); track badge) {
+            <span>{{ badge }}</span>
+          }
+        </div>
+        <p>{{ value(dish, 'eyebrow') }}</p>
+        <h2>{{ value(dish, 'name') }}</h2>
+        <strong>{{ value(dish, 'price') }} €</strong>
+        <div class="product-description">{{ value(dish, 'description') }}</div>
+        @if (value(dish, 'chefQuote') !== '—') {
+          <blockquote>“{{ value(dish, 'chefQuote') }}”</blockquote>
+        }
+        @if (dishAllergens(dish).length) {
+          <div class="product-allergens">
+            <b>Allergènes</b><span>{{ dishAllergens(dish).join(' · ') }}</span>
+          </div>
+        }
+        <a
+          [href]="'/menu/' + value(dish, 'category.slug') + '/' + value(dish, 'slug')"
+          target="_blank"
+          >Ouvrir la fiche publique ↗</a
+        >
+      </div>
+    </section>
+  </div>
+}
+@if (galleryPreview(); as photo) {
+  <div class="gallery-lightbox" (click)="galleryPreview.set(null)">
+    <button type="button" (click)="galleryPreview.set(null)" aria-label="Fermer">×</button>
+    <figure (click)="$event.stopPropagation()">
+      <img [src]="value(photo, 'imageUrl')" [alt]="value(photo, 'alt')" />
+      <figcaption>
+        <small>{{ value(photo, 'category') }}</small
+        ><strong>{{ value(photo, 'title') }}</strong>
+        <p>{{ value(photo, 'alt') }}</p>
+      </figcaption>
+    </figure>
+  </div>
+}

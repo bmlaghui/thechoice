@@ -1,0 +1,106 @@
+@if (!hidePublicChrome()) {
+<a class="skip-link" href="#main">Aller au contenu</a>
+<header class="site-header" [class.scrolled]="scrolled()">
+  <a class="brand" routerLink="/" aria-label="The Choice, accueil"
+    ><img
+      [ngSrc]="site.identity().logo"
+      width="116"
+      height="49"
+      priority
+      [alt]="site.identity().name + ' · ' + site.identity().baseline"
+  /></a>
+  <nav class="desktop-nav" aria-label="Navigation principale">
+    <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }"
+      >Accueil</a
+    ><a routerLink="/restaurant" routerLinkActive="active">Le restaurant</a
+    ><a routerLink="/menu" routerLinkActive="active">Le menu</a
+    ><a routerLink="/reservation" routerLinkActive="active">Réservation</a
+    ><a routerLink="/events" routerLinkActive="active">Événements</a
+    ><a routerLink="/gallery" routerLinkActive="active">Galerie</a
+    ><a routerLink="/contact" routerLinkActive="active">Contact</a>
+  </nav>
+  <a class="button header-cta" routerLink="/reservation">Réserver</a
+  ><button
+    class="menu-toggle"
+    type="button"
+    (click)="toggleMenu()"
+    [attr.aria-expanded]="menuOpen()"
+    [attr.aria-label]="menuOpen() ? 'Fermer le menu' : 'Ouvrir le menu'"
+    aria-controls="mobile-menu"
+  >
+    <span></span><span></span><span></span>
+  </button>
+</header>
+@if (menuOpen()) {
+  <nav id="mobile-menu" class="mobile-nav" aria-label="Navigation mobile">
+    <button type="button" class="close" (click)="closeMenu()" aria-label="Fermer le menu">×</button
+    ><a routerLink="/" (click)="closeMenu()">Accueil</a
+    ><a routerLink="/restaurant" (click)="closeMenu()">Le restaurant</a
+    ><a routerLink="/menu" (click)="closeMenu()">Le menu</a
+    ><a routerLink="/events" (click)="closeMenu()">Événements</a
+    ><a routerLink="/gallery" (click)="closeMenu()">Galerie</a
+    ><a routerLink="/contact" (click)="closeMenu()">Contact</a
+    ><a class="button" routerLink="/reservation" (click)="closeMenu()">Réserver une table</a>
+  </nav>
+}
+}
+<main id="main"><router-outlet /></main>
+@if (!hidePublicChrome()) {
+<footer class="site-footer">
+  <a class="footer-brand" routerLink="/"
+    ><img
+      [ngSrc]="site.identity().logo"
+      width="180"
+      height="76"
+      [alt]="site.identity().name + ' · ' + site.identity().baseline"
+  /></a>
+  <div>
+    <b>Adresse</b>
+    <p>{{ site.contact().address }}</p>
+  </div>
+  <div>
+    <b>Horaires</b>
+    <p>@for(group of site.hourGroups();track group.label){<span>{{group.label}} · {{group.hours}}</span>@if(!$last){<br />}} @empty {Horaires indisponibles}</p>
+  </div>
+  <div>
+    <b>Contact</b>
+    <p>
+      <a [href]="'tel:' + site.contact().phone">{{ site.contact().phone }}</a><br /><a
+        [href]="'mailto:' + site.contact().email"
+        >{{ site.contact().email }}</a
+      >
+    </p>
+  </div>
+  <div>
+    <b>Suivez-nous</b>
+    <p class="social-links">
+      <a [href]="site.socialUrl('instagram')" target="_blank" rel="noreferrer" aria-label="Instagram"
+        ><svg viewBox="0 0 24 24" fill="none">
+          <rect x="3" y="3" width="18" height="18" rx="5" stroke="currentColor" />
+          <circle cx="12" cy="12" r="4" stroke="currentColor" />
+          <circle cx="17.5" cy="6.5" r="1" fill="currentColor" /></svg></a
+      ><a [href]="site.socialUrl('tiktok')" target="_blank" rel="noreferrer" aria-label="TikTok"
+        ><svg viewBox="0 0 24 24" fill="none">
+          <path
+            d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5"
+            stroke="currentColor"
+            stroke-linecap="round"
+          /></svg></a
+      ><a [href]="site.socialUrl('facebook')" target="_blank" rel="noreferrer" aria-label="Facebook"
+        ><svg viewBox="0 0 24 24" fill="none">
+          <path
+            d="M18 3h-3a4 4 0 0 0-4 4v3H8v4h3v7h4v-7h3l1-4h-4V7h3V3Z"
+            stroke="currentColor"
+            stroke-linejoin="round"
+          /></svg
+      ></a>
+    </p>
+  </div>
+  <div class="footer-bottom">
+    <small>© 2026 The Choice Restaurant · Tous droits réservés</small>
+    <nav aria-label="Liens légaux">
+      <a routerLink="/gallery">Galerie</a><a routerLink="/legal">Mentions légales</a><a routerLink="/privacy">Confidentialité</a>
+    </nav>
+  </div>
+</footer>
+}

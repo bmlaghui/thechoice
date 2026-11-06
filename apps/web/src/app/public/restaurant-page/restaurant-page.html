@@ -1,0 +1,118 @@
+<article class="restaurant-page">
+
+  <!-- ═══ HERO ═══════════════════════════════════════════════════════════════ -->
+  <section class="r-hero" [style.background-image]="intro().imageUrl ? 'linear-gradient(90deg,#020503ee,#02050355),url(&quot;' + intro().imageUrl + '&quot;)' : null">
+    <div class="r-hero-copy">
+      <p class="eyebrow">Le Restaurant</p>
+      <h1 class="r-title">{{ intro().title }}</h1>
+      <p class="r-hero-desc">{{ intro().text }}</p>
+    </div>
+  </section>
+
+  <!-- ═══ GALERIE SALLE ════════════════════════════════════════════════════ -->
+  <section class="r-gallery-section" aria-labelledby="restaurant-gallery-title">
+    <header class="r-gallery-heading">
+      <div><p class="eyebrow">En images</p><h2 id="restaurant-gallery-title">Découvrez l'ambiance</h2></div>
+      <a class="r-link" routerLink="/gallery">Voir toute la galerie <span aria-hidden="true">⟶</span></a>
+    </header>
+    <div class="r-gallery">
+      @for (item of gallery(); track item.imageUrl; let index = $index) {
+        <a routerLink="/gallery" class="r-gal-item" [class.r-gal--1]="index===0" [class.r-gal--2]="index===1" [class.r-gal--3]="index===2" [style.background-image]="'url(&quot;' + item.imageUrl + '&quot;)'" [attr.aria-label]="'Voir la galerie : ' + item.alt"></a>
+      }
+    </div>
+  </section>
+
+  <!-- ═══ CHIFFRES CLÉS ════════════════════════════════════════════════════ -->
+  <section class="r-stats" aria-label="Chiffres clés du restaurant">
+    <div>
+      <strong>{{ site.restaurantStats().seats }}</strong>
+      <span>Places assises</span>
+    </div>
+    <div>
+      <strong>{{ site.restaurantStats().parking }}</strong>
+      <span>Places parking</span>
+    </div>
+    <div>
+      <strong>Ouvert</strong>
+      <span>Selon les horaires</span>
+    </div>
+    <div>
+      <strong>{{ site.restaurantStats().certification }}</strong>
+      <span>{{ site.restaurantStats().certificationLabel }}</span>
+    </div>
+    <div>
+      <strong>Événements</strong>
+      <span>Privatisation</span>
+    </div>
+  </section>
+
+  <!-- ═══ VALEURS ═══════════════════════════════════════════════════════════ -->
+  <section class="r-values">
+    <div class="r-values-grid">
+      <article>
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M7 20h10M9 20v-7l-3-2 2-5 3 2 1-5 2 5 3-2 1 5-3 2v7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <h3>Cuisine Fusion</h3>
+        <p>Inspirée des quatre coins du monde</p>
+      </article>
+      <article>
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M7 4c2 3 8 3 10 0l2 5-2 2v9H7v-9L5 9l2-5Z" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <h3>Produits Frais</h3>
+        <p>Sélection rigoureuse de saison</p>
+      </article>
+      <article>
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="8" cy="9" r="3" stroke="currentColor" stroke-width="1.4"/><circle cx="16" cy="9" r="3" stroke="currentColor" stroke-width="1.4"/><circle cx="12" cy="15" r="3" stroke="currentColor" stroke-width="1.4"/><path d="M3 20c0-3 2-5 5-5m8 0c3 0 5 2 5 5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <h3>Ambiance Unique</h3>
+        <p>Un cadre élégant et chaleureux</p>
+      </article>
+      <article>
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 20v-8h16v8M2 12h20M8 12V7a2 2 0 0 1 4 0v5m0 0V6a2 2 0 0 1 4 0v6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <h3>Service Attentionné</h3>
+        <p>À votre écoute à chaque instant</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- ═══ VIDÉO / AMBIANCE ══════════════════════════════════════════════════ -->
+  <section class="r-video">
+    <div class="r-video-brand">
+      <img ngSrc="/images/logo/logo-official.png" width="360" height="152" alt="The Choice Fusion Food">
+    </div>
+    <div class="r-video-scene">
+      <video #restaurantVideo class="r-video-player" controls preload="metadata" poster="/images/restaurant/unnamed (2).webp" (play)="videoPlaying.set(true)" (pause)="videoPlaying.set(false)" aria-label="Présentation vidéo du restaurant The Choice">
+        <source src="/video.mp4" type="video/mp4">
+        Votre navigateur ne prend pas en charge la lecture vidéo.
+      </video>
+      @if (!videoPlaying()) {
+        <button type="button" class="r-play" (click)="playVideo()" aria-label="Lire la vidéo de présentation">
+          <span class="r-play-icon" aria-hidden="true">▶</span>
+          <small>Voir la vidéo</small>
+        </button>
+      }
+    </div>
+  </section>
+
+  <!-- ═══ L'ART DE RECEVOIR ════════════════════════════════════════════════ -->
+  <section class="r-cta-band">
+    <div class="r-cta-copy">
+      <p class="eyebrow">Notre philosophie</p>
+      <h2 class="r-title">L'art de recevoir,<br>le plaisir de <em>partager.</em></h2>
+      <div class="r-cta-actions">
+        <a class="button" routerLink="/reservation" id="btn-reserver-restaurant">Réserver une table</a>
+        <a class="r-link" routerLink="/gallery" id="lnk-ambiance">Voir l'ambiance <span aria-hidden="true">⟶</span></a>
+      </div>
+    </div>
+    <div class="r-cta-visual" aria-hidden="true"></div>
+  </section>
+
+  <!-- ═══ PRIVATISATION ════════════════════════════════════════════════════ -->
+  <section class="r-private">
+    <div class="r-private-photo" role="img" aria-label="Service en salle lors d'un événement"></div>
+    <div class="r-private-copy">
+      <p class="eyebrow">Votre événement, notre savoir-faire</p>
+      <h2 class="r-title">Privatisez<br>l'espace.</h2>
+      <p class="r-muted">Anniversaires, repas d'affaires, soirées privées… Notre équipe vous accompagne pour créer des moments sur mesure, inoubliables.</p>
+      <a class="button" routerLink="/quote" id="btn-privatisation">Demander un devis</a>
+    </div>
+  </section>
+
+</article>

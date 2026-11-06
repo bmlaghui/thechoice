@@ -1,0 +1,147 @@
+<article class="reservation-page">
+  <!-- ═══ HERO ════════════════════════════════════════════════════════════ -->
+  <header class="res-hero" [style.background-image]="pageContent().imageUrl ? 'linear-gradient(90deg,#030604ee,#03060466),url(&quot;' + pageContent().imageUrl + '&quot;)' : null">
+    <p class="eyebrow">{{ pageContent().eyebrow }}</p>
+    <h1 class="res-title">{{ pageContent().title }}</h1>
+    <p class="res-subtitle">{{ pageContent().text }}</p>
+  </header>
+
+  <!-- ═══ CONTENU PRINCIPAL ═══════════════════════════════════════════════ -->
+  <main class="res-main">
+    <!-- Card formulaire -->
+    <section class="res-form-card" aria-label="Formulaire de réservation">
+      @if (sent()) {
+        <div class="res-success" role="status">
+          <div class="res-success-icon" aria-hidden="true">✓</div>
+          <h2>Demande envoyée</h2>
+          <p>Notre équipe vous recontacte rapidement pour confirmer votre réservation.</p>
+        </div>
+      } @else {
+        <form [formGroup]="form" (ngSubmit)="submit()" novalidate class="res-form">
+          <label class="contact-trap" aria-hidden="true">Site web<input formControlName="website" tabindex="-1" autocomplete="off" /></label>
+          <section class="booking-step" aria-labelledby="step-1-title">
+            <header class="step-heading"><span>01</span><div><p>Votre venue</p><h2 id="step-1-title">Quand souhaitez-vous venir ?</h2></div></header>
+            <div class="visit-grid">
+              <label for="r-date">Date<input id="r-date" type="date" formControlName="date" [min]="minDate" [max]="maxDate()" /></label>
+              <label for="r-guests">Nombre de personnes<select id="r-guests" formControlName="guests">
+                @for (count of guestOptions(); track count) { <option [value]="count">{{ count }} personne{{ count > 1 ? 's' : '' }}</option> }
+              </select></label>
+            </div>
+            <fieldset class="slot-picker" [attr.aria-busy]="loadingSlots()">
+              <legend>Choisissez votre heure</legend>
+              @if (loadingSlots()) {
+                <div class="slot-loading" role="status">Recherche des créneaux disponibles…</div>
+              } @else {
+                @if (schedule(); as hours) {
+                  <p class="slot-help" [class.closed]="hours.closed">{{ hours.closed ? 'Le restaurant est fermé ce jour.' : hours.label + ' · service de ' + hours.opensAt + ' à ' + hours.closesAt }}</p>
+                }
+                <div class="slot-grid">
+                  @for (slot of slots(); track slot.value) {
+                    <button type="button" class="slot-button" [class.selected]="form.controls.time.value === slot.value" [attr.aria-pressed]="form.controls.time.value === slot.value" (click)="selectSlot(slot.value)">
+                      <span>{{ slot.label }}</span>@if (slot.nextDay) { <small>lendemain</small> }
+                    </button>
+                  } @empty {
+                    <p class="no-slots">Aucun créneau réservable pour cette date.</p>
+                  }
+                </div>
+              }
+            </fieldset>
+          </section>
+
+          <section class="booking-step" aria-labelledby="step-2-title">
+            <header class="step-heading"><span>02</span><div><p>Vos coordonnées</p><h2 id="step-2-title">À quel nom réservons-nous ?</h2></div></header>
+            <div class="res-form-grid">
+              <label for="r-name">Nom complet<input id="r-name" type="text" formControlName="name" autocomplete="name" placeholder="Votre nom" /></label>
+              <label for="r-email">E-mail<input id="r-email" type="email" formControlName="email" autocomplete="email" placeholder="vous@email.fr" /></label>
+              <label for="r-phone">Téléphone<input id="r-phone" type="tel" formControlName="phone" autocomplete="tel" inputmode="tel" placeholder="06 00 00 00 00" /></label>
+              <label class="full" for="r-message">Demande particulière <span class="optional">(optionnel)</span><textarea id="r-message" rows="3" formControlName="message" placeholder="Allergies, chaise bébé, occasion…"></textarea></label>
+            </div>
+          </section>
+
+          <section class="booking-step booking-confirm" aria-labelledby="step-3-title">
+            <header class="step-heading"><span>03</span><div><p>Confirmation</p><h2 id="step-3-title">Vérifiez votre demande</h2></div></header>
+            <div class="booking-summary">
+              <span><small>Date</small>{{ form.controls.date.value }}</span>
+              <span><small>Heure</small>{{ form.controls.time.value || 'À choisir' }}</span>
+              <span><small>Table</small>{{ form.controls.guests.value }} personne{{ form.controls.guests.value > 1 ? 's' : '' }}</span>
+            </div>
+          <label class="consent" for="r-consent"
+            ><input id="r-consent" type="checkbox" formControlName="consent" /><span
+              >J’accepte que mes informations soient utilisées pour traiter ma demande de
+              réservation.</span
+            ></label
+          >
+          @if (error()) {
+            <p class="res-error" role="alert">{{ error() }}</p>
+          }
+
+          <app-turnstile (tokenChange)="turnstileToken.set($event)" />
+          <button
+            class="button res-submit"
+            type="submit"
+            id="btn-reserver-maintenant"
+            [disabled]="sending() || !slots().length || !form.controls.time.value || (site.turnstileSiteKey() && !turnstileToken())"
+          >
+            {{ sending() ? 'Envoi en cours…' : 'Réserver maintenant' }}
+          </button>
+          </section>
+        </form>
+      }
+
+      <!-- Infos restaurant sous le formulaire -->
+      <div class="res-info-strip">
+        <div>
+          <span class="res-info-label">Téléphone</span>
+          <a [href]="'tel:' + site.contact().phone">{{ site.contact().phone }}</a>
+        </div>
+        <div>
+          <span class="res-info-label">Email</span>
+          <a [href]="'mailto:' + site.contact().email">{{ site.contact().email }}</a>
+        </div>
+        <div>
+          <span class="res-info-label">Adresse</span>
+          <span>{{ site.contact().address }}</span>
+        </div>
+        <div>
+          <span class="res-info-label">Horaires</span>
+          @for (group of site.hourGroups(); track group.label) { <span>{{ group.label }} · {{ group.hours }}</span> }
+        </div>
+      </div>
+    </section>
+
+    <!-- Map placeholder -->
+    <app-restaurant-map [address]="site.contact().address" [latitude]="site.contact().latitude" [longitude]="site.contact().longitude" [compact]="true" />
+
+    <!-- Localisation détaillée -->
+    <div class="res-location">
+      <div class="res-loc-block">
+        <b>The Choice Restaurant</b>
+        <p>{{ site.contact().address }}</p>
+      </div>
+      <a
+        class="button secondary res-itinerary"
+        [href]="'https://www.google.com/maps/dir/?api=1&destination=' + site.contact().address"
+        target="_blank"
+        rel="noreferrer noopener"
+        id="lnk-itineraire"
+      >
+        Itinéraire ⟶
+      </a>
+      <div class="res-loc-block">
+        <b>Horaires</b>
+        <p>@for (group of site.hourGroups(); track group.label) { <span>{{ group.label }}<br />{{ group.hours }}</span>@if (!$last) { <br /><br /> } } @empty { Horaires indisponibles }</p>
+      </div>
+      <div class="res-loc-block">
+        <b>Suivez-nous</b>
+        <p class="res-social-icons">
+          <a [href]="site.socialUrl('instagram')" target="_blank" rel="noreferrer" aria-label="Instagram"
+            >◎</a
+          ><a [href]="site.socialUrl('tiktok')" target="_blank" rel="noreferrer" aria-label="TikTok">♪</a
+          ><a [href]="site.socialUrl('facebook')" target="_blank" rel="noreferrer" aria-label="Facebook"
+            >f</a
+          >
+        </p>
+      </div>
+    </div>
+  </main>
+</article>

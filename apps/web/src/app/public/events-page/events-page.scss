@@ -1,0 +1,179 @@
+$bg:      #060806;
+$border:  rgba(255,255,255,.1);
+$brand:   #3a8a4a;
+$brand-l: #5cb068;
+$muted:   #a7afa9;
+
+:host { display: block; background: $bg; color: #fff; }
+
+.eyebrow {
+  margin: 0;
+  color: $brand-l;
+  font: 600 11px / 1 'Manrope', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: .18em;
+}
+
+// ═══ HERO ════════════════════════════════════════════════════════════════════
+.events-page { padding-top: 80px; }
+
+.ev-hero {
+  position: relative;
+  min-height: 590px;
+  overflow: hidden;
+  border-bottom: 1px solid $border;
+  background: #070a08;
+}
+
+.ev-hero-copy {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  width: 64%;
+  min-height: 590px;
+  padding: 60px clamp(28px, 8vw, 120px);
+  background: linear-gradient(90deg,#050806 0%,rgba(5,8,6,.96) 52%,rgba(5,8,6,.58) 78%,transparent);
+}
+
+.ev-title {
+  margin: 12px 0 18px;
+  font: 400 clamp(40px, 5.5vw, 70px) / .9 'Bebas Neue', sans-serif;
+  letter-spacing: .01em;
+  text-transform: uppercase;
+
+  em { color: $brand-l; font-style: normal; }
+}
+
+.ev-hero-desc {
+  max-width: 420px;
+  margin: 0 0 24px;
+  color: $muted;
+  font: 400 13px / 1.72 'Manrope', sans-serif;
+}
+
+.ev-hero-visual {
+  position: absolute;
+  inset: 0;
+  background:
+    url('/images/events/champagne.png') center right / cover no-repeat;
+  transition: transform .9s ease;
+}
+.ev-hero-visual::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,#050806 0%,rgba(5,8,6,.46) 36%,transparent 68%),linear-gradient(0deg,#05080666,transparent 45%)}
+.ev-hero:hover .ev-hero-visual{transform:scale(1.025)}
+
+// ═══ 4 OFFERS ════════════════════════════════════════════════════════════════
+.ev-offers {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border-bottom: 1px solid $border;
+  background: #080a08;
+}
+
+.ev-offer-item {
+  display: grid;
+  place-content: center;
+  text-align: center;
+  padding: 36px 20px;
+  border-right: 1px solid $border;
+
+  &:last-child { border-right: 0; }
+}
+
+.ev-offer-icon {
+  margin: 0 auto 16px;
+
+  svg {
+    width: 42px;
+    height: 42px;
+    color: $brand;
+  }
+}
+
+.ev-offer-title {
+  margin: 0 0 8px;
+  font: 600 12px / 1 'Manrope', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+}
+
+.ev-offer-desc {
+  margin: 0;
+  max-width: 160px;
+  color: $muted;
+  font: 400 11px / 1.5 'Manrope', sans-serif;
+}
+
+// ═══ PRIVATISATION ══════════════════════════════════════════════════════════
+.ev-private {
+  display: grid;
+  grid-template-columns: .65fr 1.35fr;
+  align-items: center;
+  gap: 40px;
+  padding: 54px clamp(28px, 7vw, 100px);
+  border-bottom: 1px solid $border;
+  background: linear-gradient(135deg, #080d0a, #060806);
+}
+
+.ev-private-copy {
+  .ev-title { margin: 12px 0 16px; }
+}
+
+.ev-private-desc {
+  max-width: 380px;
+  margin: 0 0 24px;
+  color: $muted;
+  font: 400 13px / 1.7 'Manrope', sans-serif;
+}
+
+.ev-private-gallery {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr 1fr;
+  gap: 8px;
+  height: 280px;
+}
+
+.ev-gal {
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  border: 1px solid $border;
+
+  &--1 { background-image: url('/images/interior.png'); background-position: left center; }
+  &--2 { background-image: url('/images/events/server-dishes.jpg'); }
+  &--3 { background-image: url('/images/events/noodles-lifestyle.jpg'); }
+}
+
+// ═══ GALERIE STRIP ══════════════════════════════════════════════════════════
+.ev-gallery-strip {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  height: 260px;
+  border-top: 1px solid $border;
+}
+
+.ev-gal-strip {
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+
+  &.ev-gstrip--1 { background-image: url('/images/restaurant/unnamed.webp'); }
+  &.ev-gstrip--2 { background-image: url('/images/restaurant/unnamed%20(2).webp'); }
+  &.ev-gstrip--3 { background-image: url('/images/restaurant/unnamed%20(3).webp'); }
+}
+
+// ═══ RESPONSIVE ═════════════════════════════════════════════════════════════
+@media (max-width: 768px) {
+  .events-page { padding-top: 70px; }
+  .ev-hero { min-height:650px; }
+  .ev-hero-copy { width:100%;min-height:650px;padding:44px 24px;justify-content:flex-end;background:linear-gradient(0deg,#050806 0%,rgba(5,8,6,.95) 45%,transparent 80%); }
+  .ev-hero-visual { background-position: 65% center; }
+  .ev-offers { grid-template-columns: 1fr 1fr; }
+  .ev-offer-item:nth-child(2) { border-right: 0; }
+  .ev-private { grid-template-columns: 1fr; padding: 44px 24px; }
+  .ev-private-gallery { height: 200px; grid-template-columns: 1fr 1fr; }
+  .ev-gal--1 { grid-column: 1 / -1; }
+  .ev-gallery-strip { height: 180px; }
+}

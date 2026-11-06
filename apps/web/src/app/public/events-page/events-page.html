@@ -1,0 +1,52 @@
+<article class="events-page">
+
+  <!-- ═══ HERO ═══════════════════════════════════════════════════════════ -->
+  <section class="ev-hero">
+    <div class="ev-hero-copy">
+      <p class="eyebrow">{{ hero().eyebrow }}</p>
+      <h1 class="ev-title">{{ hero().title }}</h1>
+      <p class="ev-hero-desc">{{ hero().text }}</p>
+      <a class="button" routerLink="/quote" id="btn-devis-hero">Demander un devis</a>
+    </div>
+    <div class="ev-hero-visual" [style.background-image]="hero().imageUrl ? 'url(&quot;' + hero().imageUrl + '&quot;)' : null" role="img" aria-label="Flûtes de champagne lors d'un événement"></div>
+  </section>
+
+  <!-- ═══ 4 FEATURES ══════════════════════════════════════════════════════ -->
+  <section class="ev-offers" aria-label="Types d'événements">
+    @for (offer of offers(); track offer.title) {
+      <article class="ev-offer-item">
+        <div class="ev-offer-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path [attr.d]="offer.icon" stroke="currentColor" stroke-width="1.4"
+                  stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <h2 class="ev-offer-title">{{ offer.title }}</h2>
+        <p class="ev-offer-desc">{{ offer.desc }}</p>
+      </article>
+    }
+  </section>
+
+  <!-- ═══ PRIVATISATION ══════════════════════════════════════════════════ -->
+  <section class="ev-private" id="devis">
+    <div class="ev-private-copy">
+      <p class="eyebrow">Un lieu à votre image</p>
+      <h2 class="ev-title">Privatisez<br>l'espace.</h2>
+      <p class="ev-private-desc">Profitez d'un espace entier pour vos événements. Notre équipe vous accompagne de A à Z pour une organisation parfaite.</p>
+      <a class="button" routerLink="/quote" id="btn-demander-devis">Demander un devis</a>
+    </div>
+    <div class="ev-private-gallery">
+      <div class="ev-gal ev-gal--1" role="img" aria-label="Salle de réception"></div>
+      <div class="ev-gal ev-gal--2" role="img" aria-label="Table décorée pour événement"></div>
+      <div class="ev-gal ev-gal--3" role="img" aria-label="Cocktail de bienvenue"></div>
+    </div>
+  </section>
+
+  <!-- ═══ GALERIE ÉVÉNEMENTS ══════════════════════════════════════════════ -->
+  <section class="ev-gallery-strip" aria-label="Galerie événements">
+    <div class="ev-gal-strip ev-gstrip--1" role="img" aria-label="Événement privé"></div>
+    <div class="ev-gal-strip ev-gstrip--2" role="img" aria-label="Repas d'entreprise"></div>
+    <div class="ev-gal-strip ev-gstrip--3" role="img" aria-label="Soirée privée"></div>
+  </section>
+
+</article>

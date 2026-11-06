@@ -1,0 +1,544 @@
+$bg: #060806;
+$border: rgba(255, 255, 255, 0.1);
+$brand: #3a8a4a;
+$brand-l: #5cb068;
+$muted: #a7afa9;
+
+:host {
+  display: block;
+  background: $bg;
+  color: #fff;
+}
+
+.eyebrow {
+  margin: 0;
+  color: $brand-l;
+  font:
+    600 11px / 1 'Manrope',
+    sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+}
+
+// ═══ HERO ════════════════════════════════════════════════════════════════════
+.reservation-page {
+  min-height: 100svh;
+  background:
+    linear-gradient(#0b0906d5, #0b0906f2),
+    url('/images/interior.png') center / cover fixed;
+}
+
+.res-hero {
+  padding: 130px clamp(22px, 6vw, 90px) 48px;
+  text-align: center;
+  border-bottom: 1px solid $border;
+}
+
+.res-title {
+  margin: 12px 0 14px;
+  font:
+    400 clamp(46px, 5.5vw, 72px) / 0.9 'Bebas Neue',
+    sans-serif;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+}
+
+.res-subtitle {
+  max-width: 480px;
+  margin: 0 auto;
+  color: $muted;
+  font:
+    400 13px / 1.7 'Manrope',
+    sans-serif;
+}
+
+// ═══ MAIN CONTENT ════════════════════════════════════════════════════════════
+.res-main {
+  width: min(100%, 640px);
+  margin: 0 auto;
+  padding: 0 20px 60px;
+}
+
+// ═══ FORM CARD ═══════════════════════════════════════════════════════════════
+.res-form-card {
+  margin-top: 32px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  overflow: hidden;
+  background: rgba(10, 14, 11, 0.95);
+  box-shadow: 0 30px 100px #000c;
+}
+
+.res-form {
+  display: grid;
+  gap: 16px;
+  padding: 28px 26px;
+
+  label {
+    font:
+      600 10px / 1 'Manrope',
+      sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #c8cec9;
+  }
+
+  input:not([type='checkbox']),
+  select,
+  textarea {
+    display: block;
+    width: 100%;
+    height: 44px;
+    margin-top: 8px;
+    padding: 0 14px;
+    color: #fff;
+    background: #111612;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 4px;
+    font:
+      400 13px / 1 'Manrope',
+      sans-serif;
+
+    option {
+      background: #0e1b10;
+    }
+  }
+
+  textarea {
+    min-height: 105px;
+    height: auto;
+    padding-block: 13px;
+    resize: vertical;
+    line-height: 1.55;
+  }
+}
+
+.res-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+.res-form-grid .full {
+  grid-column: 1/-1;
+}
+.slot-help {
+  margin: -3px 0 0;
+  padding: 10px 12px;
+  border-left: 2px solid $brand-l;
+  background: #152018;
+  color: #b7c2b9;
+  font:
+    500 10px/1.5 'Manrope',
+    sans-serif;
+}
+.slot-help.closed,
+.res-error {
+  border-color: #bd5a4d;
+  background: #241311;
+  color: #efb7af;
+}
+.consent {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  text-transform: none !important;
+  line-height: 1.5 !important;
+  letter-spacing: 0 !important;
+  cursor: pointer;
+}
+.consent input {
+  flex: 0 0 auto;
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  accent-color: $brand;
+}
+.res-error {
+  margin: 0;
+  padding: 11px 13px;
+  border-left: 2px solid #bd5a4d;
+  font:
+    500 10px/1.5 'Manrope',
+    sans-serif;
+}
+.res-submit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.res-submit {
+  width: 100%;
+  height: 46px;
+  border-radius: 4px;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+@media (max-width: 560px) {
+  .res-form-grid {
+    grid-template-columns: 1fr;
+  }
+  .res-form-grid .full {
+    grid-column: auto;
+  }
+}
+
+// Strip infos
+.res-info-strip {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: $border;
+  border-top: 1px solid $border;
+
+  > div {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    padding: 14px 18px;
+    background: #0a0f0b;
+    font:
+      400 11px / 1.4 'Manrope',
+      sans-serif;
+    color: #d0d5d1;
+
+    span {
+      display: block;
+    }
+  }
+}
+
+.res-info-label {
+  color: $brand-l;
+  font:
+    600 9px / 1 'Manrope',
+    sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+// ═══ MAP PLACEHOLDER ════════════════════════════════════════════════════════
+.res-map {
+  height: 240px;
+  display: grid;
+  place-content: center;
+  text-align: center;
+  gap: 4px;
+  margin-top: 1px;
+  background:
+    linear-gradient(#0c1310cc, #0c1310cc),
+    repeating-linear-gradient(45deg, #303d38 0 1px, transparent 1px 38px);
+  border: 1px solid $border;
+  border-radius: 0 0 12px 12px;
+}
+
+.res-map-pin {
+  color: $brand-l;
+  font-size: 36px;
+}
+
+.res-map strong {
+  font:
+    400 20px / 1 'Bebas Neue',
+    sans-serif;
+  letter-spacing: 0.05em;
+}
+
+.res-map small {
+  font:
+    500 7px / 1 'Manrope',
+    sans-serif;
+  letter-spacing: 0.24em;
+  color: $muted;
+}
+
+// ═══ LOCALISATION ════════════════════════════════════════════════════════════
+.res-location {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 16px;
+  margin-top: 24px;
+  padding: 20px 24px;
+  border: 1px solid $border;
+  border-radius: 10px;
+  background: rgba(10, 14, 11, 0.9);
+  align-items: start;
+}
+
+.res-loc-block {
+  b {
+    display: block;
+    margin-bottom: 5px;
+    font:
+      600 10px / 1 'Manrope',
+      sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: $brand-l;
+  }
+  p {
+    margin: 0;
+    color: $muted;
+    font:
+      400 11px / 1.55 'Manrope',
+      sans-serif;
+    a {
+      color: $muted;
+      &:hover {
+        color: $brand-l;
+      }
+    }
+  }
+}
+
+.res-itinerary {
+  grid-row: 1 / 2;
+  grid-column: 2;
+  align-self: start;
+  height: 36px;
+  min-height: 36px;
+  font-size: 10px;
+  border-radius: 3px;
+}
+.res-social-icons {
+  display: flex !important;
+  gap: 8px;
+}
+.res-social-icons a {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 50%;
+  color: #b7c0ba !important;
+  font: 600 13px 'Manrope';
+}
+.res-social-icons a:hover {
+  border-color: $brand-l;
+  color: $brand-l !important;
+}
+
+// ═══ SUCCESS ═════════════════════════════════════════════════════════════════
+.res-success {
+  padding: 50px 28px;
+  text-align: center;
+
+  h2 {
+    margin: 14px 0 8px;
+    font:
+      500 28px / 1 'Manrope', Arial, sans-serif;
+  }
+  p {
+    color: $muted;
+    font-size: 13px;
+  }
+}
+
+.res-success-icon {
+  width: 50px;
+  height: 50px;
+  margin: 0 auto;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: $brand;
+  font-size: 20px;
+}
+
+// ═══ RESPONSIVE ═════════════════════════════════════════════════════════════
+@media (max-width: 600px) {
+  .res-hero {
+    padding: 100px 20px 36px;
+  }
+  .res-info-strip {
+    grid-template-columns: 1fr;
+  }
+  .res-location {
+    grid-template-columns: 1fr;
+  }
+  .res-itinerary {
+    grid-row: auto;
+    grid-column: auto;
+    width: 100%;
+  }
+}
+
+/* Refonte immersive */
+.reservation-page {
+  display: grid;
+  grid-template-columns: 0.82fr 1.18fr;
+  align-items: start;
+  padding-top: 78px;
+  background:
+    linear-gradient(90deg, rgba(3, 6, 4, 0.96) 0%, rgba(3, 6, 4, 0.68) 48%, #071009 100%),
+    url('/images/interior.png') center/cover fixed;
+}
+.res-hero {
+  position: sticky;
+  top: 78px;
+  min-height: calc(100svh - 78px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 70px clamp(35px, 7vw, 110px);
+  text-align: left;
+  border: 0;
+}
+.res-title {
+  font-size: clamp(68px, 7vw, 108px);
+  line-height: 0.82;
+}
+.res-subtitle {
+  max-width: 430px;
+  margin: 0;
+  color: #c0c9c2;
+}
+.res-main {
+  width: 100%;
+  margin: 0;
+  padding: 52px clamp(28px, 6vw, 90px) 80px;
+  background: linear-gradient(135deg, rgba(7, 16, 9, 0.92), rgba(4, 8, 5, 0.98));
+  border-left: 1px solid rgba(255, 255, 255, 0.12);
+}
+.res-form-card {
+  margin: 0;
+  border-radius: 8px;
+  background: rgba(7, 15, 9, 0.72);
+  backdrop-filter: blur(16px);
+  box-shadow: 0 35px 110px #0008;
+}
+.res-form {
+  display: block;
+  padding: 0;
+}
+.booking-step {
+  padding: 34px;
+  border-bottom: 1px solid $border;
+}
+.step-heading {
+  display: flex;
+  align-items: flex-start;
+  gap: 15px;
+  margin-bottom: 25px;
+  > span {
+    display: grid;
+    place-items: center;
+    width: 35px;
+    height: 35px;
+    flex: 0 0 auto;
+    border: 1px solid rgba($brand-l, .55);
+    border-radius: 50%;
+    color: $brand-l;
+    font: 600 10px 'Manrope', sans-serif;
+  }
+  p { margin: 1px 0 5px; color: $brand-l; font: 600 9px 'Manrope', sans-serif; text-transform: uppercase; letter-spacing: .14em; }
+  h2 { margin: 0; font: 500 clamp(22px, 2.2vw, 30px)/1.05 'Manrope', Arial, sans-serif; }
+}
+.visit-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.slot-picker {
+  min-width: 0;
+  margin: 25px 0 0;
+  padding: 0;
+  border: 0;
+  legend { margin-bottom: 12px; color: #c8cec9; font: 600 10px 'Manrope', sans-serif; text-transform: uppercase; letter-spacing: .1em; }
+}
+.slot-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 12px;
+}
+.slot-button {
+  min-height: 50px;
+  padding: 8px 5px;
+  border: 1px solid rgba(255,255,255,.14);
+  border-radius: 6px;
+  color: #e9eeea;
+  background: #101612;
+  cursor: pointer;
+  transition: .2s ease;
+  span { display: block; font: 600 13px 'Manrope', sans-serif; }
+  small { display: block; margin-top: 2px; color: $muted; font: 500 8px 'Manrope', sans-serif; text-transform: uppercase; }
+  &:hover { border-color: rgba($brand-l,.7); background: #152219; }
+  &.selected { border-color: $brand-l; color: #fff; background: linear-gradient(145deg, #347e41, #245f31); box-shadow: 0 8px 24px rgba(23,91,37,.3); }
+}
+.slot-loading, .no-slots { grid-column: 1/-1; padding: 18px; color: $muted; background: #101612; border-radius: 6px; font: 500 12px/1.5 'Manrope', sans-serif; text-align: center; }
+.booking-summary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  margin-bottom: 20px;
+  overflow: hidden;
+  border: 1px solid $border;
+  border-radius: 7px;
+  background: $border;
+  span { padding: 14px; background: #101612; color: #fff; font: 600 12px 'Manrope', sans-serif; }
+  small { display: block; margin-bottom: 6px; color: $brand-l; font: 600 8px 'Manrope', sans-serif; text-transform: uppercase; letter-spacing: .12em; }
+}
+.optional { color: $muted; font-weight: 400; text-transform: none; }
+.booking-confirm { border-bottom: 0; }
+.booking-confirm .consent { margin-bottom: 15px; }
+.res-info-strip > div:last-child span:not(.res-info-label) { margin-bottom: 3px; }
+.res-loc-block p > span { display: inline-block; }
+.slot-help { margin: 0; }
+.res-form label:first-child {
+  grid-column: auto;
+}
+.res-submit {
+  grid-column: 1/-1;
+  height: 50px;
+  background: linear-gradient(90deg, #3e8c4b, #2c6e38);
+}
+.contact-trap {
+  position: absolute !important;
+  left: -10000px !important;
+  width: 1px !important;
+  height: 1px !important;
+  overflow: hidden !important;
+}
+.res-map {
+  border-radius: 0;
+  height: 180px;
+}
+.res-location {
+  border-radius: 8px;
+  background: rgba(5, 12, 7, 0.72);
+}
+@media (max-width: 850px) {
+  .reservation-page {
+    display: block;
+    padding-top: 68px;
+    background-attachment: scroll;
+  }
+  .res-hero {
+    position: relative;
+    top: auto;
+    min-height: 500px;
+    padding: 110px 24px 50px;
+    justify-content: flex-end;
+  }
+  .res-main {
+    padding: 30px 18px 60px;
+    border: 0;
+  }
+  .res-form {
+    display: block;
+  }
+  .res-form label:first-child,
+  .res-submit {
+    grid-column: auto;
+  }
+  .booking-step { padding: 26px 20px; }
+  .slot-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 500px) {
+  .visit-grid, .booking-summary { grid-template-columns: 1fr; }
+  .slot-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .step-heading h2 { font-size: 23px; }
+}

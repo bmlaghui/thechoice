@@ -1,0 +1,408 @@
+$green: #59a864;
+$line: rgba(255, 255, 255, 0.12);
+$muted: #9ca69f;
+:host {
+  display: block;
+  background: #040604;
+  color: #fff;
+}
+.eyebrow {
+  margin: 0;
+  color: $green;
+  font: 600 10px/1 'Manrope';
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+}
+.menu-hero {
+  position: relative;
+  min-height: 570px;
+  display: flex;
+  align-items: center;
+  padding: 105px clamp(28px, 8vw, 126px) 50px;
+  overflow: hidden;
+  background: #030504;
+}
+.menu-hero-image {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, #020403 0%, rgba(2, 4, 3, 0.88) 32%, rgba(2, 4, 3, 0.2) 70%),
+    linear-gradient(0deg, #040604 0%, transparent 32%),
+    url('/images/hero/sharing-table-01.jpg') 68% center/cover;
+  animation: hero-reveal 1.2s ease both;
+}
+.menu-hero-copy {
+  position: relative;
+  z-index: 2;
+  max-width: 850px;
+  animation: copy-in 0.9s 0.15s ease both;
+}
+.menu-hero-copy h1 {
+  margin: 13px 0 19px;
+  font: 400 clamp(68px, 7vw, 108px)/0.78 'Bebas Neue';
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+}
+.menu-hero-copy h1 > span { white-space: nowrap; }
+.menu-hero-copy h1 em {
+  color: $green;
+  font-style: normal;
+}
+.menu-hero-copy > p:last-of-type {
+  max-width: 470px;
+  color: #b2bbb5;
+  font: 400 13px/1.7 'Manrope';
+}
+.menu-hero-copy > a {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 17px;
+  padding-bottom: 7px;
+  border-bottom: 1px solid $green;
+  font: 600 10px 'Manrope';
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.menu-hero-copy > a span {
+  color: $green;
+}
+.menu-hero-note {
+  position: absolute;
+  z-index: 2;
+  right: clamp(28px, 7vw, 110px);
+  top: 190px;
+  display: grid;
+  padding: 14px 0 0 22px;
+  border-left: 1px solid $green;
+}
+.menu-hero-note span,
+.menu-hero-note small {
+  color: $muted;
+  font: 500 8px 'Manrope';
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+}
+.menu-hero-note strong {
+  margin: 3px 0 7px;
+  font: 400 27px 'Bebas Neue';
+  text-transform: uppercase;
+}
+.menu-experience {
+  display: grid;
+  grid-template-columns: 250px 1fr;
+  align-items: start;
+  max-width: 1500px;
+  margin: auto;
+  padding: 70px clamp(24px, 5vw, 76px) 100px;
+}
+.category-rail {
+  position: sticky;
+  top: 100px;
+  padding-right: 36px;
+}
+.category-rail > p {
+  margin: 0 0 22px;
+  color: #a3aaa5;
+  font: 600 9px 'Manrope';
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+}
+.category-rail button {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 15px 5px;
+  color: #777f7a;
+  background: none;
+  border: 0;
+  border-bottom: 1px solid #ffffff0d;
+  text-align: left;
+  font: 500 13px 'Manrope';
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    color 0.25s,
+    padding 0.25s;
+}
+.category-rail button span {
+  font: 500 8px 'Space Grotesk';
+  color: #4d5550;
+}
+.category-rail button::after {
+  content: '→';
+  position: absolute;
+  right: 4px;
+  opacity: 0;
+  transform: translateX(-8px);
+  color: $green;
+  transition: 0.25s;
+}
+.category-rail button:hover,
+.category-rail button.active {
+  color: #fff;
+  padding-left: 12px;
+}
+.category-rail button.active span {
+  color: $green;
+}
+.category-rail button.active::after {
+  opacity: 1;
+  transform: none;
+}
+.menu-content {
+  min-width: 0;
+  border-left: 1px solid $line;
+  padding-left: clamp(30px, 5vw, 76px);
+}
+.category-header {
+  position: relative;
+  min-height: 350px;
+  overflow: hidden;
+  border: 1px solid $line;
+  background: #080d09;
+  animation: category-in 0.55s ease both;
+}
+.category-header > div:first-child {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  min-height: 350px;
+  flex-direction: column;
+  justify-content: center;
+  padding: 45px;
+  background: linear-gradient(90deg,#060a07 0%,rgba(6,10,7,.94) 37%,rgba(6,10,7,.36) 72%,transparent);
+}
+.category-header h2 {
+  margin: 10px 0 14px;
+  font: 400 clamp(46px, 6vw, 80px)/0.85 'Bebas Neue';
+  text-transform: uppercase;
+}
+.category-header > div:first-child > p:last-child {
+  max-width: 360px;
+  margin: 0;
+  color: #b1bbb4;
+  font: 400 12px/1.7 'Manrope';
+}
+.category-visual {
+  position: absolute;
+  inset: 0;
+  background-position: center;
+  background-size: cover;
+  transition: transform 0.8s;
+}
+.category-header:hover .category-visual {
+  transform: scale(1.035);
+}
+.dish-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 18px;
+}
+.dish-card {
+  position: relative;
+  overflow: hidden;
+  background: #080c09;
+  border: 1px solid $line;
+  animation: card-in 0.55s var(--delay) ease both;
+  transition:
+    transform 0.35s,
+    border-color 0.35s,
+    box-shadow 0.35s;
+}
+.dish-card:hover {
+  transform: translateY(-6px);
+  border-color: #5fab694d;
+  box-shadow: 0 22px 60px #0009;
+}
+.dish-image {
+  position: relative;
+  display: block;
+  height: 270px;
+  overflow: hidden;
+  background-position: center;
+  background-size: cover;
+}
+.dish-image::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(0deg, #071009a8, transparent 50%);
+  transition: background 0.3s;
+}
+.dish-image span {
+  position: absolute;
+  z-index: 2;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -42%);
+  padding: 11px 17px;
+  border: 1px solid #ffffff55;
+  background: #051008b8;
+  opacity: 0;
+  font: 600 9px 'Manrope';
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  transition: 0.3s;
+}
+.dish-card:hover .dish-image span {
+  opacity: 1;
+  transform: translate(-50%, -50%);
+}
+.heart {
+  position: absolute;
+  z-index: 3;
+  right: 16px;
+  top: 16px;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  color: #fff;
+  background: #050806b8;
+  border: 1px solid #ffffff3a;
+  border-radius: 50%;
+  backdrop-filter: blur(8px);
+  font-size: 22px;
+  cursor: pointer;
+  transition: 0.25s;
+}
+.heart:hover {
+  transform: scale(1.1);
+  border-color: $green;
+}
+.heart.active {
+  color: #7bcd85;
+  background: #173c20;
+}
+.dish-copy {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 4px 18px;
+  padding: 22px;
+}
+.dish-copy > div > p {
+  margin: 0 0 7px;
+  color: $green;
+  font: 600 8px 'Manrope';
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+}
+.dish-copy h3 {
+  margin: 0;
+  font: 400 25px/1 'Bebas Neue';
+  text-transform: uppercase;
+}
+.dish-copy > strong {
+  color: $green;
+  font: 600 17px 'Space Grotesk';
+}
+.dish-description {
+  grid-column: 1/-1;
+  margin: 9px 0 0;
+  color: $muted;
+  font: 400 11px/1.65 'Manrope';
+}
+@keyframes hero-reveal {
+  from {
+    opacity: 0;
+    transform: scale(1.08);
+  }
+}
+@keyframes copy-in {
+  from {
+    opacity: 0;
+    transform: translateY(25px);
+  }
+}
+@keyframes category-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+}
+@keyframes card-in {
+  from {
+    opacity: 0;
+    transform: translateY(22px);
+  }
+}
+@media (max-width: 900px) {
+  .menu-hero {
+    min-height: 540px;
+    padding: 100px 24px 48px;
+  }
+  .menu-hero-copy h1 {
+    font-size: clamp(48px, 14vw, 70px);
+  }
+  .menu-hero-note {
+    display: none;
+  }
+  .menu-experience {
+    display: block;
+    padding: 35px 0 70px;
+  }
+  .category-rail {
+    position: sticky;
+    z-index: 20;
+    top: 68px;
+    display: flex;
+    gap: 8px;
+    padding: 12px 16px;
+    overflow: auto;
+    background: #050806e8;
+    backdrop-filter: blur(14px);
+  }
+  .category-rail > p {
+    display: none;
+  }
+  .category-rail button {
+    flex: 0 0 auto;
+    width: auto;
+    padding: 10px 16px;
+    border: 1px solid $line;
+    border-radius: 30px;
+  }
+  .category-rail button span,
+  .category-rail button::after {
+    display: none;
+  }
+  .category-rail button.active {
+    padding-left: 16px;
+    background: #245e31;
+  }
+  .menu-content {
+    padding: 20px 16px;
+    border: 0;
+  }
+  .category-header {
+    min-height: 310px;
+  }
+  .category-header > div:first-child {
+    min-height: 310px;
+    padding: 30px 24px;
+    background: linear-gradient(90deg,#060a07 0%,rgba(6,10,7,.9) 58%,rgba(6,10,7,.2));
+  }
+  .dish-grid {
+    grid-template-columns: 1fr;
+  }
+  .dish-image {
+    height: 240px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .menu-hero-image,
+  .menu-hero-copy,
+  .category-header,
+  .dish-card {
+    animation: none;
+  }
+  .dish-card,
+  .category-visual {
+    transition: none;
+  }
+}

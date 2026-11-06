@@ -1,0 +1,52 @@
+:host ::ng-deep .data-card td:nth-child(4) .pill{display:block;max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.message-overlay{position:fixed;z-index:190;inset:0;display:flex;justify-content:flex-end;background:#020503b8;backdrop-filter:blur(8px)}
+.message-panel{display:flex;flex-direction:column;width:min(620px,100%);height:100%;padding:0;background:#f7f7f2;color:#172019;box-shadow:-20px 0 70px #0005;animation:message-in .25s ease-out}
+.message-panel header{display:flex;align-items:flex-start;justify-content:space-between;padding:38px 40px 30px;border-bottom:1px solid #dfe4de}
+.message-panel header small{color:#3d8b4c;font-size:9px;font-weight:700;letter-spacing:.16em}
+.message-panel h2{margin:8px 0 0;font:700 34px/1 'Barlow Condensed',Impact,sans-serif;text-transform:uppercase}
+.message-panel header button{width:38px;height:38px;border:1px solid #d5ddd5;border-radius:50%;background:#fff;color:#657168;font-size:22px;cursor:pointer}
+.message-contact{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;margin:28px 40px 0;overflow:hidden;border:1px solid #dce2dc;border-radius:8px;background:#dce2dc}
+.message-contact>*{min-width:0;padding:18px;background:#fff}
+.message-contact>*:last-child{grid-column:1/-1}
+.message-contact span,.message-body>span{display:block;margin-bottom:7px;color:#849087;font-size:9px;text-transform:uppercase;letter-spacing:.12em}
+.message-contact strong{display:block;overflow:hidden;color:#263029;font-size:12px;text-overflow:ellipsis;white-space:nowrap}
+.message-contact a:hover strong{color:#338043}
+.message-body{flex:1;margin:24px 40px;padding:26px;border-left:3px solid #42904f;background:#fff;overflow:auto}
+.message-body p{margin:0;color:#303a32;font-size:15px;line-height:1.75;white-space:pre-wrap}
+.message-panel footer{display:flex;justify-content:flex-end;gap:10px;padding:22px 40px;border-top:1px solid #dfe4de;background:#fff}
+.message-panel footer .delete{margin-right:auto;border:1px solid #e7c9c4;background:#fff6f4;color:#a04436}
+.message-panel footer .danger-button{display:inline-flex;align-items:center;gap:8px;margin-right:auto;min-height:44px;padding:0 17px;border:1px solid #d86e5e;border-radius:5px;background:#fff1ee;color:#a73f32;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;cursor:pointer;transition:.2s}
+.message-panel footer .danger-button:hover{background:#b44435;border-color:#b44435;color:#fff;box-shadow:0 8px 20px #a53c3026}
+.reply-editor{margin:0 40px 24px;border:1px solid #d9dfd9;border-radius:8px;background:#fff;overflow:hidden}
+.reply-editor label{display:block;padding:13px 16px;border-bottom:1px solid #e4e8e3}
+.reply-editor label span{display:block;margin-bottom:6px;color:#7d897f;font-size:9px;text-transform:uppercase;letter-spacing:.1em}
+.reply-editor label input{width:100%;border:0;outline:0;background:transparent;color:#263129;font-size:13px}
+.wysiwyg-toolbar{display:flex;gap:4px;padding:8px 10px;border-bottom:1px solid #e4e8e3;background:#f5f7f3}
+.wysiwyg-toolbar button{min-width:32px;height:30px;padding:0 9px;border:1px solid transparent;border-radius:4px;background:transparent;color:#435047;cursor:pointer}
+.wysiwyg-toolbar button:hover{border-color:#cad6cb;background:#fff;color:#2d793b}
+.wysiwyg-content{min-height:180px;max-height:280px;padding:18px;color:#2d382f;font-size:14px;line-height:1.65;overflow:auto;outline:0}
+.wysiwyg-content:focus{box-shadow:inset 3px 0 #4a9857}
+.message-panel:has(.reply-editor) .message-body{flex:0 0 auto;max-height:150px}
+.message-panel footer button:disabled{opacity:.55;cursor:wait}
+.message-panel:has(.reply-editor){width:min(680px,100%);overflow:hidden}
+.message-panel:has(.reply-editor) header{padding-block:28px 22px}
+.message-panel:has(.reply-editor) .message-contact{margin-top:20px}
+.message-panel:has(.reply-editor) .reply-editor{display:flex;flex:1 1 auto;min-height:270px;flex-direction:column;box-shadow:0 10px 30px #15251a0b}
+.message-panel:has(.reply-editor) .reply-editor label{padding:14px 18px;background:#fff}
+.message-panel:has(.reply-editor) .reply-editor label input{display:block;height:34px;padding:0!important;border:0!important;border-radius:0!important;background:#fff!important;color:#1f2a22!important;box-shadow:none!important;font-size:14px!important;font-weight:500}
+.message-panel:has(.reply-editor) .reply-editor label input:focus{outline:0!important}
+.message-panel:has(.reply-editor) .wysiwyg-toolbar{align-items:center;padding:7px 14px;background:#f6f8f5}
+.message-panel:has(.reply-editor) .wysiwyg-toolbar button{font-size:12px}
+.message-panel:has(.reply-editor) .wysiwyg-content{flex:1 1 auto;min-height:180px;max-height:none;padding:24px 20px;font-size:14px;line-height:1.75}
+.message-panel:has(.reply-editor) footer{position:relative;z-index:3;flex:0 0 auto;align-items:center;margin-top:auto;padding-block:16px;background:#080c09;border-top-color:#172019;box-shadow:0 -12px 30px #07100918}
+.message-panel:has(.reply-editor) footer .secondary{border-color:#dce2dc;background:#fff;color:#69746c}
+.message-panel:has(.reply-editor) footer .primary{min-width:164px;min-height:46px;font-weight:600;box-shadow:0 8px 22px #2d763c35}
+.message-panel:has(.reply-editor) footer .danger-button{border-color:#d76455;background:#fff4f1;color:#b33e31;box-shadow:none}
+@keyframes message-in{from{transform:translateX(35px);opacity:0}to{transform:none;opacity:1}}
+@media(max-width:620px){.message-panel header,.message-panel footer{padding-inline:22px}.message-contact,.message-body,.reply-editor{margin-inline:22px}.message-contact{grid-template-columns:1fr}.message-contact>*:last-child{grid-column:auto}.message-panel footer{flex-wrap:wrap}.message-panel footer .delete,.message-panel footer .danger-button{margin-right:0}}
+.messages-card table{min-width:1420px}
+.messages-card td:nth-child(4){max-width:330px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.messages-card th:last-child,.messages-card td:last-child{width:360px;min-width:360px}
+.messages-card .row-actions{display:flex;justify-content:flex-end;gap:6px;overflow:visible}
+.messages-card .row-actions button{margin:0;white-space:nowrap}
+.messages-card .row-actions .message-view{border-color:#9fc9a5;background:#edf7ee;color:#276f35;font-weight:600}

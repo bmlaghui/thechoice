@@ -1,0 +1,15 @@
+node_modules
+**/node_modules
+**/dist
+**/.angular
+**/coverage
+.git
+.github
+.env
+.env.*
+!.env.example
+*.log
+uploads
+ChatGPT Image*.png
+THE_CHOICE_CODEX_MASTER_PROMPT.md
+

@@ -1,0 +1,267 @@
+<!-- ═══════════════════════════════════════════════════════════
+     HERO — plein écran, image + logo centré + CTAs
+     ═══════════════════════════════════════════════════════════ -->
+<section class="hero">
+  <div class="hero-slides" aria-hidden="true">
+    @for (slide of slides(); track slide.image; let index = $index) {
+      <div
+        class="hero-slide"
+        [class.active]="activeSlide() === index"
+        [style.background-image]="'url(&quot;' + slide.image + '&quot;)'"
+      ></div>
+    }
+  </div>
+  @if (slides().length > 1) {
+    <button class="hero-pause" type="button" (click)="slidesPaused.set(!slidesPaused())" [attr.aria-pressed]="slidesPaused()">{{ slidesPaused() ? 'Reprendre le diaporama' : 'Mettre en pause le diaporama' }}</button>
+  }
+  <!-- numéroteur latéral gauche -->
+  <aside class="hero-counter" aria-hidden="true">
+    @for (slide of slides(); track slide.image; let index = $index) {
+      <span [class.active]="activeSlide() === index">0{{ index + 1 }}</span>
+    }
+  </aside>
+
+  <!-- copy centrale -->
+  <div class="hero-copy">
+    <h1>
+      <img
+        [ngSrc]="site.identity().logo"
+        width="580"
+        height="245"
+        priority
+        [alt]="site.identity().name + ' · ' + heroContent().title"
+        class="hero-logo"
+      />
+    </h1>
+    <p class="hero-tagline">{{ heroContent().title }}</p>
+    <div class="hero-actions">
+      <a class="button" routerLink="/reservation" id="cta-reserver-hero">{{ heroContent().primaryCta }}</a>
+      <a class="hero-link" routerLink="/menu" id="cta-menu-hero"
+        >{{ heroContent().secondaryCta }} <span aria-hidden="true">⟶</span></a
+      >
+    </div>
+  </div>
+
+  <!-- indicateur scroll -->
+  <a class="hero-scroll" href="#philosophie" aria-label="Défiler vers le contenu">
+    <span>Scroll</span>
+    <svg viewBox="0 0 20 28" width="12" aria-hidden="true">
+      <line x1="10" y1="0" x2="10" y2="20" />
+      <polyline points="4,14 10,22 16,14" />
+    </svg>
+  </a>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     PHILOSOPHIE — "Chaque repas est une expérience."
+     ═══════════════════════════════════════════════════════════ -->
+<section id="philosophie" class="philosophy">
+  <div class="philosophy-copy">
+    <p class="eyebrow">{{ philosophyContent().eyebrow }}</p>
+    <h2 class="section-title">{{ philosophyContent().title }}</h2>
+    <p class="muted">{{ philosophyContent().text }}</p>
+    <a class="text-link" routerLink="/restaurant" id="lnk-notre-histoire"
+      >{{ philosophyContent().linkLabel }} <span aria-hidden="true">⟶</span></a
+    >
+  </div>
+  <div
+    class="philosophy-image"
+    [style.background-image]="philosophyContent().imageUrl ? 'url(&quot;' + philosophyContent().imageUrl + '&quot;)' : null"
+    role="img"
+    [attr.aria-label]="philosophyContent().imageAlt"
+  ></div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     CHEF — La passion dans chaque détail
+     ═══════════════════════════════════════════════════════════ -->
+<section id="chef" class="chef">
+  <div class="chef-image" [style.background-image]="chefContent().imageUrl ? 'url(&quot;' + chefContent().imageUrl + '&quot;)' : 'none'" role="img" [attr.aria-label]="chefContent().imageAlt"></div>
+  <div class="chef-copy">
+    <p class="eyebrow">{{ chefContent().eyebrow }}</p>
+    <h2 class="section-title">{{ chefContent().title }}</h2>
+    <p class="muted">{{ chefContent().text }}</p>
+    <p class="chef-signature">{{ chefContent().signature }}</p>
+    <a class="text-link" routerLink="/menu" id="lnk-voir-menu"
+      >{{ chefContent().linkLabel }} <span aria-hidden="true">⟶</span></a
+    >
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     BEST SELLERS — carrousel 4 plats
+     ═══════════════════════════════════════════════════════════ -->
+@if (dishes().length) {
+<section id="best-sellers" class="best-sellers" aria-label="Nos best sellers">
+  <div class="best-sellers-head">
+    <div>
+      <p class="eyebrow">{{ bestSellersContent().eyebrow }}</p>
+      <h2 class="section-title">{{ bestSellersContent().title }}</h2>
+    </div>
+    <a class="text-link" routerLink="/menu" id="lnk-menu-complet"
+      >{{ bestSellersContent().linkLabel }} <span aria-hidden="true">⟶</span></a
+    >
+  </div>
+  <div class="carousel-wrapper">
+    <div #dishTrack class="dish-track" role="list">
+      @for (dish of dishes(); track dish.name) {
+        <article class="dish-card" role="listitem">
+          <div class="dish-photo">
+            @if (dish.image) { <img [ngSrc]="dish.image" width="400" height="280" [alt]="dish.name" loading="lazy" /> }
+          </div>
+          <div class="dish-body">
+            <h3>{{ dish.name }}</h3>
+            <p>{{ dish.desc }}</p>
+            <strong>{{ dish.price }}</strong>
+          </div>
+        </article>
+      }
+    </div>
+    <button
+      class="carousel-btn prev"
+      type="button"
+      aria-label="Plats précédents"
+      (click)="scrollDishes(-1)"
+    >
+      ‹
+    </button>
+    <button
+      class="carousel-btn next"
+      type="button"
+      aria-label="Plats suivants"
+      (click)="scrollDishes(1)"
+    >
+      ›
+    </button>
+  </div>
+</section>
+
+}
+
+<section class="ambiance" aria-labelledby="ambiance-title">
+  <div class="ambiance-copy">
+    <p class="eyebrow">{{ ambianceContent().eyebrow }}</p>
+    <h2 id="ambiance-title" class="section-title">{{ ambianceContent().title }}</h2>
+    <p class="muted">{{ ambianceContent().text }}</p>
+    <a class="text-link" routerLink="/restaurant"
+      >{{ ambianceContent().linkLabel }} <span aria-hidden="true">⟶</span></a
+    >
+  </div>
+  <div class="ambiance-mosaic" aria-label="Aperçu du restaurant">
+    <div
+      class="ambiance-shot ambiance-shot--main"
+      [style.background-image]="ambianceContent().imageUrl ? 'url(&quot;' + ambianceContent().imageUrl + '&quot;)' : 'none'"
+      role="img"
+      [attr.aria-label]="ambianceContent().imageAlt"
+    ></div>
+    <div
+      class="ambiance-shot ambiance-shot--detail"
+      [style.background-image]="ambianceContent().imageUrl2 ? 'url(&quot;' + ambianceContent().imageUrl2 + '&quot;)' : 'none'"
+      role="img"
+      [attr.aria-label]="ambianceContent().imageAlt2"
+    ></div>
+  </div>
+</section>
+
+@if (testimonials().length) {
+<section class="testimonials" aria-labelledby="testimonials-title">
+  <header>
+    <p class="eyebrow">{{ testimonialsContent().eyebrow }}</p>
+    <h2 id="testimonials-title" class="section-title">{{ testimonialsContent().title }}</h2>
+  </header>
+  <div class="testimonial-stage">
+    <div class="testimonial-carousel-grid">
+      @for (offset of [0, 1, 2]; track offset) {
+        @if (testimonials()[(activeTestimonial() + offset) % testimonials().length]; as testimonial) {
+          <article class="testimonial-slide">
+            <div
+              class="testimonial-avatar"
+              [style.background-image]="'url(&quot;' + testimonial.avatar + '&quot;)'"
+              role="img"
+              [attr.aria-label]="testimonial.name"
+            ></div>
+            <div class="testimonial-card">
+              <div class="stars" [attr.aria-label]="testimonial.rating + ' étoiles'">{{ '★'.repeat(testimonial.rating) }}</div>
+              <blockquote>“{{ testimonial.quote }}”</blockquote>
+              <footer>
+                <strong>{{ testimonial.name }}</strong
+                ><span>—</span><small>{{ testimonial.context }}</small>
+              </footer>
+            </div>
+          </article>
+        }
+      }
+    </div>
+    <div class="testimonial-controls">
+      <button type="button" (click)="previousTestimonial()" aria-label="Témoignage précédent">
+        ←</button
+      ><span>0{{ activeTestimonial() + 1 }} / 0{{ testimonials().length }}</span
+      ><button type="button" (click)="nextTestimonial()" aria-label="Témoignage suivant">→</button>
+    </div>
+  </div>
+</section>
+
+}
+
+<section class="booking" aria-labelledby="booking-title">
+  <div class="booking-copy">
+    <p class="eyebrow">{{ bookingContent().eyebrow }}</p>
+    <h2 id="booking-title" class="section-title">{{ bookingContent().title }}</h2>
+    <p class="muted">{{ bookingContent().text }}</p>
+  </div>
+  @if (reservationSent()) {
+    <div class="booking-success" role="status">
+      <strong>Votre demande est enregistrée.</strong>
+      <p>Notre équipe revient vers vous rapidement.</p>
+    </div>
+  } @else {
+    <form
+      class="booking-form"
+      [formGroup]="reservationForm"
+      (ngSubmit)="submitReservation()"
+      novalidate
+    >
+      <label>Date<input type="date" formControlName="date" [min]="minReservationDate" [max]="maxReservationDate()" /></label>
+      <label
+        >Heure<select formControlName="time" [attr.aria-busy]="loadingReservationSlots()" [attr.aria-disabled]="loadingReservationSlots() || !reservationSlots().length">
+          <option value="">{{ loadingReservationSlots() ? 'Chargement…' : 'Choisir une heure' }}</option>
+          @for (slot of reservationSlots(); track slot.value) {
+            <option [value]="slot.value">{{ slot.label }}{{ slot.nextDay ? ' · lendemain' : '' }}</option>
+          }
+        </select></label
+      >
+      <label
+        >Personnes<select formControlName="guests">
+          @for (count of guestOptions(); track count) { <option [value]="count">{{ count }} personne{{ count > 1 ? 's' : '' }}</option> }
+        </select></label
+      >
+      @if (reservationSchedule(); as hours) {
+        <p class="booking-slots-help">{{ hours.closed ? 'Restaurant fermé ce jour' : hours.label + ' · ' + hours.opensAt + ' – ' + hours.closesAt }}</p>
+      }
+      @if (reservationError()) { <p class="booking-error" role="alert">{{ reservationError() }}</p> }
+      <button class="button" type="submit" [disabled]="loadingReservationSlots() || !reservationSlots().length">{{ bookingContent().submitLabel }}</button>
+    </form>
+  }
+</section>
+
+<section class="features" aria-label="Les atouts du restaurant">
+  <article class="feature-item">
+    <span class="feature-icon" aria-hidden="true">♧</span><strong>{{ site.restaurantStats().seats }}</strong
+    ><small>{{ featuresContent().seatsLabel }}</small>
+  </article>
+  <article class="feature-item">
+    <span class="feature-icon" aria-hidden="true">◇</span><strong>{{ site.restaurantStats().parking }}</strong
+    ><small>{{ featuresContent().parkingLabel }}</small>
+  </article>
+  <article class="feature-item">
+    <span class="feature-icon" aria-hidden="true">◷</span><strong>{{ featuresContent().openValue }}</strong
+    ><small>{{ featuresContent().openLabel }}</small>
+  </article>
+  <article class="feature-item">
+    <span class="feature-icon" aria-hidden="true">✓</span><strong>{{ site.restaurantStats().certification }}</strong><small>{{ site.restaurantStats().certificationLabel }}</small>
+  </article>
+  <article class="feature-item">
+    <span class="feature-icon" aria-hidden="true">▣</span><strong>{{ featuresContent().eventsValue }}</strong
+    ><small>{{ featuresContent().eventsLabel }}</small>
+  </article>
+</section>

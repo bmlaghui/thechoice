@@ -1,0 +1,4 @@
+<section class="map-shell" [class.compact]="compact()" aria-label="Carte et itinéraire vers The Choice">
+  <div #mapCanvas class="map-canvas" role="application" aria-label="Carte interactive localisant The Choice"></div>
+  <div class="map-card"><span>Nous trouver</span><strong>The Choice</strong><p>{{ address() }}</p><a [href]="directionsUrl()" target="_blank" rel="noopener noreferrer">Ouvrir l’itinéraire ⟶</a></div>
+</section>
