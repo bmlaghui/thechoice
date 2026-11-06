@@ -23,7 +23,7 @@ Secrets à définir dans **Settings → Secrets and variables → Actions** :
 | `VPS_SSH_KEY` | clé privée dédiée au déploiement, clé publique autorisée sur le VPS |
 | `VPS_THECHOICE_APP_DIR` | `/opt/thechoice` |
 
-La connexion SSH n’est pas un secret : utiliser une clé dédiée. Ne jamais ajouter sa clé privée au dépôt ou à une commande de log.
+Utiliser les identifiants de déploiement existants, ou faire autoriser une clé limitée au déploiement par l’administrateur du VPS. Ne jamais ajouter la clé privée au dépôt ou à une commande de log.
 
 ## Configuration du VPS
 
