@@ -5,7 +5,7 @@
 - Dépôt distant configuré : `https://github.com/bmlaghui/thechoice.git` ; branche locale `main`. Le push sera effectué par l’utilisateur depuis son terminal authentifié.
 - VPS IONOS : `217.154.15.174`.
 - Racine dédiée : `/opt/thechoice`.
-- Première release activée : `2ee2ed3585d44a920b32b19daec940fb0477dfb5`, via `/opt/thechoice/current`.
+- Première release : `2ee2ed3585d44a920b32b19daec940fb0477dfb5`. Release applicative finale active : `2a112e9e9b2976b7c2f267b587637a8863cc8bd4`, via `/opt/thechoice/current`.
 - Images API et web construites et testées localement puis transférées par SSH ; aucune compilation lourde sur le VPS.
 - Passerelle dédiée : `127.0.0.1:8084`. Base, API et SSR restent sur le réseau privé Docker.
 - Secrets générés sur le VPS dans `/opt/thechoice/shared/.env.prod`, mode `0600`.
@@ -21,6 +21,7 @@
 - Configuration Compose stricte, migrations sur base vide, bootstrap administrateur et health checks validés avec les vraies images Docker.
 - Les quatre services de production du VPS sont sains ; migration terminée avec succès.
 - Vérification Chrome du vrai site via un tunnel SSH temporaire : huit pages en 1440 et 390 pixels, HTTP 200, aucune image HTML cassée, aucun débordement horizontal ni exception JavaScript.
+- Adresse IP réelle restaurée derrière les deux proxys en production. Test effectif : un visiteur reçoit 100 réponses HTTP 200 puis une 429 ; un autre visiteur reçoit toujours HTTP 200.
 - Redéploiement du même commit validé : sauvegarde PostgreSQL créée avant migration, administrateur existant préservé, services sains.
 - Certificat Let’s Encrypt valide pour `thechoice.mlaghuibrahim.fr`, accueil HTTP 200 en HTTPS vérifié depuis l’extérieur en résolvant directement vers le VPS.
 - Stack de test locale arrêtée après validation ; services de développement conservés.
@@ -33,7 +34,7 @@ L’utilisateur a confirmé avoir configuré les quatre secrets Actions : `VPS_H
 
 ## Points en attente
 
-- L’entrée DNS A `thechoice → 217.154.15.174` est confirmée directement auprès des serveurs IONOS faisant autorité. Le certificat HTTPS est délivré. Certains résolveurs conservent encore la réponse négative antérieure ; leur cache doit expirer pour un accès normal depuis tous les réseaux.
+- L’entrée DNS A `thechoice → 217.154.15.174` est confirmée directement auprès des serveurs IONOS faisant autorité et du résolveur Cloudflare. Le certificat HTTPS est délivré. Certains résolveurs conservent encore la réponse négative antérieure ; leur cache doit expirer pour un accès normal depuis tous les réseaux.
 - SMTP non fourni : aucune réutilisation des identifiants des autres projets. Les e-mails ne sont pas opérationnels ; configurer le vrai serveur SMTP dans le fichier privé du VPS et recréer l’API. Les rappels sont désactivés en attendant.
 - Turnstile non configuré : clés vides, widget désactivé. Ajouter les vraies clés si souhaité.
 - Compléter les informations légales et valider les contenus avant présentation publique définitive.
